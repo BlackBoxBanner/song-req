@@ -30,7 +30,7 @@ const SongList = ({type: userType = "user"}: SongListProps) => {
   return (
     <>
       <section className="grid grid-rows-[auto,1fr] w-full h-full gap-4">
-        <p>ตรางเพลงจะรีทุก ๆ 5 วินาที</p>
+        <p className="text-sm">ตรางเพลงจะรีทุก ๆ 5 วินาที</p>
         <DataTable columns={column} data={songs} />
       </section>
     </>
