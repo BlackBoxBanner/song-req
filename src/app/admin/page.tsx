@@ -12,7 +12,7 @@ const AdminPage = async () => {
       {session ? (
         <>
           <DeactivateSession />
-          <SongList type="admin" />
+          <SongList type="admin" initialCountDownTime={5} />
         </>
       ) : (
         <>
