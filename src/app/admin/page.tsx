@@ -6,19 +6,21 @@ import prisma from "@/lib/prisma";
 import {cn} from "@/lib/utils";
 
 const AdminPage = async () => {
-  const session = (await prisma.session.findMany())[0];
+  const sessions = await prisma.session.findMany();
+
+  if (sessions.length <= 0)
+    return (
+      <main className={cn("min-h-dvh h-dvh flex p-2 flex-col gap-4 relative")}>
+        <ActivateSession />
+      </main>
+    );
+
   const song = await prisma.song.findMany();
 
   return (
     <main className={cn("min-h-dvh h-dvh flex p-2 flex-col gap-4 relative")}>
-      {session ? (
-        <>
-          <DeactivateSession />
-          <SongList type="admin" initData={song} />
-        </>
-      ) : (
-        <ActivateSession />
-      )}
+      <DeactivateSession />
+      <SongList type="admin" initData={song} />
     </main>
   );
 };
