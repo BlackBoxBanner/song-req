@@ -1,6 +1,7 @@
 import type {Metadata} from "next";
 import {Maitree} from "next/font/google";
 import "./globals.css";
+import {Toaster} from "@/components/ui/toaster";
 
 const maitree = Maitree({
   subsets: ["latin"],
@@ -18,7 +19,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="th">
-      <body className={maitree.className}>{children}</body>
+      <body className={maitree.className}>
+        <Toaster />
+        {children}
+      </body>
     </html>
   );
 }
