@@ -2,52 +2,78 @@ import prisma from "@/lib/prisma";
 import {revalidatePath} from "next/cache";
 import {NextRequest, NextResponse} from "next/server";
 
+const revalidateAllPaths = () => {
+  revalidatePath("/");
+  revalidatePath("/admin");
+};
+
 export const GET = async () => {
-  const song = await prisma.song.findMany();
-  return NextResponse.json(song);
+  try {
+    const songs = await prisma.song.findMany();
+    return NextResponse.json(songs);
+  } catch (err: any) {
+    throw new Error(err);
+  }
+};
+
+export const POST = async (request: NextRequest) => {
+  try {
+    const body = (await request.json()) as {title: string; sessionId: string};
+
+    await prisma.song.create({
+      data: {
+        title: body.title,
+        sessionId: body.sessionId,
+      },
+    });
+
+    revalidateAllPaths();
+
+    const allSongs = await prisma.song.findMany();
+    return NextResponse.json(allSongs);
+  } catch (err: any) {
+    throw new Error(err);
+  }
 };
 
 export const PATCH = async (request: NextRequest) => {
-  const body = (await request.json()) as {id: string};
-
   try {
+    const body = (await request.json()) as {id: string};
+
     const song = await prisma.song.findUnique({
-      where: {
-        id: body.id,
-      },
-    });
-    await prisma.song.update({
-      where: {
-        id: body.id,
-      },
-      data: {
-        done: !song?.done,
-      },
+      where: {id: body.id},
     });
 
-    revalidatePath("/");
-    revalidatePath("/admin");
+    if (song) {
+      await prisma.song.update({
+        where: {id: body.id},
+        data: {done: !song.done},
+      });
 
-    return NextResponse.json({message: "Song updated"});
+      revalidateAllPaths();
+
+      const allSongs = await prisma.song.findMany();
+      return NextResponse.json(allSongs);
+    } else {
+      throw new Error("Song not found");
+    }
   } catch (err: any) {
     throw new Error(err);
   }
 };
 
 export const DELETE = async (request: NextRequest) => {
-  const body = (await request.json()) as {id: string};
-
   try {
+    const body = (await request.json()) as {id: string};
+
     await prisma.song.delete({
-      where: {
-        id: body.id,
-      },
+      where: {id: body.id},
     });
 
-    revalidatePath("/");
-    revalidatePath("/admin");
+    revalidateAllPaths();
 
-    return NextResponse.json({message: "Song updated"});
+    const allSongs = await prisma.song.findMany();
+    return NextResponse.json(allSongs);
   } catch (err: any) {
     throw new Error(err);
   }

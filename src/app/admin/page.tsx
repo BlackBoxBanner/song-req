@@ -7,44 +7,36 @@ import {cn} from "@/lib/utils";
 
 const AdminPage = async () => {
   const session = (await prisma.session.findMany())[0];
+  const song = await prisma.song.findMany();
+
   return (
     <main className={cn("min-h-dvh h-dvh flex p-2 flex-col gap-4 relative")}>
       {session ? (
         <>
           <DeactivateSession />
-          <SongList
-            socket={session.socket}
-            type="admin"
-            initialCountDownTime={5}
-          />
+          <SongList type="admin" initData={song} />
         </>
       ) : (
-        <>
-          <ActivateSession />
-        </>
+        <ActivateSession />
       )}
     </main>
   );
 };
 
+const ActivateSession = () => (
+  <form action={activateSessionAction} className="w-full h-full">
+    <Button className="w-full h-full text-4xl" type="submit">
+      เปิดห้อง
+    </Button>
+  </form>
+);
+
+const DeactivateSession = () => (
+  <form action={deactivateSessionAction}>
+    <Button className="w-full" type="submit">
+      ปิดห้อง
+    </Button>
+  </form>
+);
+
 export default AdminPage;
-
-const ActivateSession = async () => {
-  return (
-    <form action={activateSessionAction} className="w-full h-full">
-      <Button className="w-full h-full text-4xl" type="submit">
-        เปิดห้อง
-      </Button>
-    </form>
-  );
-};
-
-const DeactivateSession = async () => {
-  return (
-    <form action={deactivateSessionAction}>
-      <Button className="w-full" type="submit">
-        ปิดห้อง
-      </Button>
-    </form>
-  );
-};
