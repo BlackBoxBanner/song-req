@@ -9,9 +9,11 @@ import {Button} from "../ui/button";
 type SongListProps = {
   type?: "admin" | "user";
   initialCountDownTime?: number;
+  socket: string;
 };
 
 const SongList = ({
+  socket,
   type: userType = "user",
   initialCountDownTime: initialCountDownTimeProps = 30,
 }: SongListProps) => {

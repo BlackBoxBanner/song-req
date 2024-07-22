@@ -14,7 +14,7 @@ export default async function Home() {
       {session ? (
         <>
           <section className={cn("flex justify-center items-center")}>
-            <SongList />
+            <SongList socket={session.socket} />
           </section>
           <section className={cn("flex justify-center items-center")}>
             <form

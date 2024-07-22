@@ -12,7 +12,11 @@ const AdminPage = async () => {
       {session ? (
         <>
           <DeactivateSession />
-          <SongList type="admin" initialCountDownTime={5} />
+          <SongList
+            socket={session.socket}
+            type="admin"
+            initialCountDownTime={5}
+          />
         </>
       ) : (
         <>
