@@ -17,6 +17,7 @@ model Session {
   id        String   @unique @default(uuid())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  socket    String
   Song      Song[]
 }
 
