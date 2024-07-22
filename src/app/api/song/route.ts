@@ -18,12 +18,11 @@ export const GET = async () => {
 
 export const POST = async (request: NextRequest) => {
   try {
-    const body = (await request.json()) as {title: string; sessionId: string};
+    const body = (await request.json()) as {title: string};
 
     await prisma.song.create({
       data: {
         title: body.title,
-        sessionId: body.sessionId,
       },
     });
 
@@ -64,11 +63,19 @@ export const PATCH = async (request: NextRequest) => {
 
 export const DELETE = async (request: NextRequest) => {
   try {
-    const body = (await request.json()) as {id: string};
+    const {id, all = false} = (await request.json()) as {
+      id: string;
+      all: boolean;
+    };
 
-    await prisma.song.delete({
-      where: {id: body.id},
-    });
+    if (all) {
+      await prisma.song.deleteMany();
+      revalidateAllPaths();
+    } else {
+      await prisma.song.delete({
+        where: {id},
+      });
+    }
 
     revalidateAllPaths();
 

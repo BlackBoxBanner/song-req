@@ -1,17 +1,12 @@
 "use client";
 
 import {socket} from "@/lib/socket";
-import {Session} from "@prisma/client";
 import {FormEvent, useEffect, useRef, useState} from "react";
 import {Button} from "../ui/button";
 import {Input} from "../ui/input";
 import {toast} from "../ui/use-toast";
 
-type RequestSongInputFormProps = {
-  session: Session;
-};
-
-const RequestSongInputForm = ({session}: RequestSongInputFormProps) => {
+const RequestSongInputForm = () => {
   const [isConnected, setIsConnected] = useState(false);
   const [songName, setSongName] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -51,7 +46,6 @@ const RequestSongInputForm = ({session}: RequestSongInputFormProps) => {
       method: "POST",
       body: JSON.stringify({
         title: songName,
-        sessionId: session.id,
       }),
     })
       .then(async (res) => {

@@ -13,18 +13,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Session {
-  id        String   @unique @default(uuid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  socket    String
-  Song      Song[]
-}
-
 model Song {
-  id        String  @unique @default(uuid())
-  sessionId String
-  title     String
-  done      Boolean @default(false)
-  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+  id    String  @unique @default(uuid())
+  title String
+  done  Boolean @default(false)
 }
