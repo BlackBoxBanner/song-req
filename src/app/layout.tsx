@@ -12,6 +12,13 @@ const maitree = Maitree({
 
 export const metadata: Metadata = {
   title: "ขอเพลง",
+  description: "แอปพลิเคชันสำหรับขอเพลงขณะไลฟ์สด",
+  keywords: ["ขอเพลง", "ไลฟ์สด", "เพลง", "แอปพลิเคชัน"],
+  authors: [{name: "BlackBoxBanner"}],
+  creator: "BlackBoxBanner",
+  applicationName: "ขอเพลง",
+  themeColor: "#FFFFFF", // or any color that fits your theme
+  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
