@@ -58,12 +58,6 @@ const RequestSongInputForm = () => {
       return;
     }
 
-    const requestSongToast = toast({
-      title: "กำลังดำเนินการ",
-      description: "กำลังขอเพลง รอสักครู่",
-      duration: 1000,
-    });
-
     try {
       const res = await fetch("/api/song", {
         method: "POST",
@@ -97,7 +91,6 @@ const RequestSongInputForm = () => {
         duration: 1000,
       });
     } finally {
-      requestSongToast.dismiss();
     }
   };
 
