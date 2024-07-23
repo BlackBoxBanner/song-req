@@ -2,17 +2,34 @@
 
 import {Song} from "@prisma/client";
 import {ColumnDef} from "@tanstack/react-table";
-import {Checkbox} from "../ui/checkbox";
 import {Button} from "../ui/button";
 import {Cross2Icon} from "@radix-ui/react-icons";
 import {socket} from "@/lib/socket";
 import {toast} from "../ui/use-toast";
 import Link from "next/link";
+import {format, toZonedTime} from "date-fns-tz";
 
 export const columns: ColumnDef<Song>[] = [
   {
     accessorKey: "title",
     header: "ชื่อเพลง",
+  },
+  {
+    accessorKey: "createAt",
+    header: () => {
+      return <p className="text-end">ขอเมื่อ</p>;
+    },
+    cell: ({getValue}) => {
+      const value = getValue() as string;
+
+      if (value) {
+        const timeZone = "Asia/Bangkok";
+        const zonedDate = toZonedTime(new Date(value), timeZone);
+        return <p className="text-end">{format(zonedDate, "HH:mm:ss")}</p>;
+      }
+
+      return "เวลาผิดพลาด";
+    },
   },
 ];
 
@@ -28,14 +45,26 @@ export const columnsAdmin: ColumnDef<Song>[] = [
           rel="noopener noreferrer"
           target="_blank"
           passHref
+          className="w-full"
           legacyBehavior>
-          <Button
-            variant={"ghost"}
-            className="w-full px-2 text-start justify-start">
-            {value as string}
-          </Button>
+          {value as string}
         </Link>
       );
+    },
+  },
+  {
+    accessorKey: "createAt",
+    header: "ขอเมื่อ",
+    cell: ({getValue}) => {
+      const value = getValue() as string;
+
+      if (value) {
+        const timeZone = "Asia/Bangkok";
+        const zonedDate = toZonedTime(new Date(value), timeZone);
+        return <>{format(zonedDate, "HH:mm:ss")}</>;
+      }
+
+      return "เวลาผิดพลาด";
     },
   },
   {
@@ -50,6 +79,7 @@ export const columnsAdmin: ColumnDef<Song>[] = [
         const deleteSongToast = toast({
           title: "เซิร์ฟเวอร์",
           description: "กำลังลบเพลง",
+          duration: 1000,
         });
 
         const id = getValue();
@@ -76,12 +106,13 @@ export const columnsAdmin: ColumnDef<Song>[] = [
               title: "โอ๊ะ!",
               description: "ลบเพลงไม่ได้ มีปัญหานิดหน่อย",
               variant: "destructive",
+              duration: 1000,
             });
           });
       };
       return (
         <div className="flex justify-end">
-          <Button variant={"link"} size={"icon"} onClick={onDelete}>
+          <Button variant={"ghost"} size={"sm"} onClick={onDelete}>
             <Cross2Icon />
           </Button>
         </div>

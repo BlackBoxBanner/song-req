@@ -14,10 +14,21 @@ const RequestSongInputForm = () => {
   useEffect(() => {
     const onConnect = () => {
       setIsConnected(true);
+      toast({
+        title: "เชื่อมต่อสำเร็จ",
+        description: "คุณเชื่อมต่อกับเซิร์ฟเวอร์แล้ว",
+        duration: 1000,
+      });
     };
 
     const onDisconnect = () => {
       setIsConnected(false);
+      toast({
+        title: "การเชื่อมต่อขาดหาย",
+        description: "ระบบไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
+        variant: "destructive",
+        duration: 1000,
+      });
     };
 
     if (socket.connected) {
@@ -33,32 +44,61 @@ const RequestSongInputForm = () => {
     };
   }, []);
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isConnected || !songName) return;
+    if (!isConnected) return;
+
+    if (!songName.trim()) {
+      toast({
+        title: "ข้อผิดพลาด",
+        description: "กรุณากรอกชื่อเพลง",
+        variant: "destructive",
+        duration: 1000,
+      });
+      return;
+    }
 
     const requestSongToast = toast({
       title: "กำลังดำเนินการ",
       description: "กำลังขอเพลง รอสักครู่",
+      duration: 1000,
     });
 
-    fetch("/api/song", {
-      method: "POST",
-      body: JSON.stringify({
-        title: songName,
-      }),
-    })
-      .then(async (res) => {
-        return await res.json();
-      })
-      .then(async (data) => {
-        socket.emit("send-song", data);
-        setSongName("");
-        inputRef.current?.focus();
-      })
-      .then(() => {
-        requestSongToast.dismiss();
+    try {
+      const res = await fetch("/api/song", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: songName.trim(),
+        }),
       });
+
+      if (!res.ok) {
+        throw new Error("การขอเพลงล้มเหลว");
+      }
+
+      const data = await res.json();
+      socket.emit("send-song", data);
+      setSongName("");
+      inputRef.current?.focus();
+
+      toast({
+        title: "ขอเพลงสำเร็จ",
+        description: "เพลงของคุณถูกขอเรียบร้อยแล้ว",
+        duration: 1000,
+      });
+    } catch (error) {
+      toast({
+        title: "เกิดข้อผิดพลาด",
+        description: "บางอย่างผิดพลาด",
+        variant: "destructive",
+        duration: 1000,
+      });
+    } finally {
+      requestSongToast.dismiss();
+    }
   };
 
   return (
@@ -67,9 +107,11 @@ const RequestSongInputForm = () => {
         ref={inputRef}
         value={songName}
         onChange={(e) => setSongName(e.target.value)}
-        placeholder={"ชื่อเพลง ..."}
+        placeholder="ชื่อเพลง ..."
       />
-      <Button type="submit">ขอเพลง</Button>
+      <Button type="submit" disabled={!isConnected || !songName.trim()}>
+        ขอเพลง
+      </Button>
     </form>
   );
 };

@@ -4,16 +4,31 @@ import prisma from "@/lib/prisma";
 import {cn} from "@/lib/utils";
 
 export default async function Home() {
-  const song = await prisma.song.findMany();
+  const song = await prisma.song.findMany({
+    orderBy: {
+      createAt: "asc",
+    },
+  });
 
   return (
-    <main className="grid min-h-dvh grid-cols-1 grid-rows-[auto,1fr,auto] gap-6 p-4">
-      <InfiniteScroll />
-      <section className={cn("flex justify-center items-center")}>
-        <SongList initData={song} />
+    <main className="snap-mandatory snap-y h-dvh">
+      <section className="grid min-h-dvh grid-cols-1 grid-rows-[auto,1fr,auto] snap-start">
+        <div className="sticky top-0 bg-background z-10 py-4 border-b">
+          <InfiniteScroll />
+        </div>
+        <section
+          className={cn("flex justify-center items-center overflow-clip px-0")}>
+          <SongList initData={song} />
+        </section>
+        <section
+          className={cn(
+            "flex justify-center items-center sticky bottom-0 bg-background p-4 border-t"
+          )}>
+          <RequestSongInputForm />
+        </section>
       </section>
-      <section className={cn("flex justify-center items-center")}>
-        <RequestSongInputForm />
+      <section className="bg-primary min-h-dvh text-primary-foreground snap-start">
+        test
       </section>
     </main>
   );
@@ -21,7 +36,7 @@ export default async function Home() {
 
 const InfiniteScroll = () => {
   return (
-    <div className="w-full inline-flex flex-nowrap overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_128px,_black_calc(100%-200px),transparent_100%)]">
+    <div className="w-full inline-flex flex-nowrap overflow-hidden ">
       <ul className="text-nowrap flex items-center justify-center md:justify-start [&_li]:mx-4 [&_img]:max-w-none animate-infinite-scroll">
         <li>พื้นที่ขอเพลง</li>
         <li>พื้นที่ขอเพลง</li>

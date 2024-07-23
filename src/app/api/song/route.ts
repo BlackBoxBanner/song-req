@@ -9,7 +9,11 @@ const revalidateAllPaths = () => {
 
 export const GET = async () => {
   try {
-    const songs = await prisma.song.findMany();
+    const songs = await prisma.song.findMany({
+      orderBy: {
+        createAt: "asc",
+      },
+    });
     return NextResponse.json(songs);
   } catch (err: any) {
     throw new Error(err);
@@ -28,7 +32,11 @@ export const POST = async (request: NextRequest) => {
 
     revalidateAllPaths();
 
-    const allSongs = await prisma.song.findMany();
+    const allSongs = await prisma.song.findMany({
+      orderBy: {
+        createAt: "asc",
+      },
+    });
     return NextResponse.json(allSongs);
   } catch (err: any) {
     throw new Error(err);
@@ -51,7 +59,11 @@ export const PATCH = async (request: NextRequest) => {
 
       revalidateAllPaths();
 
-      const allSongs = await prisma.song.findMany();
+      const allSongs = await prisma.song.findMany({
+        orderBy: {
+          createAt: "asc",
+        },
+      });
       return NextResponse.json(allSongs);
     } else {
       throw new Error("Song not found");
@@ -79,7 +91,11 @@ export const DELETE = async (request: NextRequest) => {
 
     revalidateAllPaths();
 
-    const allSongs = await prisma.song.findMany();
+    const allSongs = await prisma.song.findMany({
+      orderBy: {
+        createAt: "asc",
+      },
+    });
     return NextResponse.json(allSongs);
   } catch (err: any) {
     throw new Error(err);

@@ -3,65 +3,74 @@
 import {Button} from "../ui/button";
 import {socket} from "@/lib/socket";
 import {toast} from "../ui/use-toast";
-import {useEffect, useState} from "react";
+import {FormEvent, useEffect, useState} from "react";
 import {updateCurrentSong} from "@/lib/updateCurrentSong";
 
 export const ClearSongForm = () => {
   const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
-    const onConnect = () => {
-      setIsConnected(true);
-    };
-
-    const onDisconnect = () => {
-      setIsConnected(false);
-    };
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
 
     if (socket.connected) {
-      onConnect();
+      handleConnect();
     }
 
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
 
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
     };
   }, []);
-  const onClearSong = () => {
+
+  const onClearSong = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
     const deleteToast = toast({
       title: "กำลังลบ",
       description: "ระบบกำลังลบเพลง รอสักครู่",
+      duration: 1000,
     });
 
     const updateToast = toast({
       title: "กำลังอัพเดท",
       description: "ระบบกำลังอัพเดทเพลง รอสักครู่",
+      duration: 1000,
     });
 
-    fetch(`/api/song`, {
-      method: "DELETE",
-      body: JSON.stringify({all: true}),
-    })
-      .then(async (res) => {
-        return await res.json();
-      })
-      .then(async (data) => {
-        socket.emit("send-song", data);
-      })
-      .finally(() => {
-        deleteToast.dismiss();
+    try {
+      const res = await fetch(`/api/song`, {
+        method: "DELETE",
+        body: JSON.stringify({all: true}),
       });
 
-    updateCurrentSong().finally(() => updateToast.dismiss());
+      const data = await res.json();
+      socket.emit("send-song", data);
+    } catch (error) {
+      console.error("Error clearing songs:", error);
+    } finally {
+      deleteToast.dismiss();
+    }
+
+    try {
+      await updateCurrentSong();
+    } catch (error) {
+      console.error("Error updating current song:", error);
+    } finally {
+      updateToast.dismiss();
+    }
   };
+
   return (
-    <>
-      <form onSubmit={onClearSong}>
-        <Button type="submit">เคลียลิสต์เพลง</Button>
-      </form>
-    </>
+    <form onSubmit={onClearSong} className="flex flex-col gap-2 w-full">
+      <Button type="submit" disabled={!isConnected}>
+        เคลียลิสต์เพลง
+      </Button>
+    </form>
   );
 };
+
+export default ClearSongForm;

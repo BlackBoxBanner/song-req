@@ -14,7 +14,8 @@ datasource db {
 }
 
 model Song {
-  id    String  @unique @default(uuid())
-  title String
-  done  Boolean @default(false)
+  id       String   @unique @default(uuid())
+  title    String
+  done     Boolean  @default(false)
+  createAt DateTime @default(now())
 }
