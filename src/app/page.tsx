@@ -27,9 +27,9 @@ export default async function Home() {
           <RequestSongInputForm />
         </section>
       </section>
-      <section className="bg-primary min-h-dvh text-primary-foreground snap-start">
+      {/* <section className="bg-primary min-h-dvh text-primary-foreground snap-start">
         test
-      </section>
+      </section> */}
     </main>
   );
 }
