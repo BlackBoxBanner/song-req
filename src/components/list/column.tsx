@@ -77,9 +77,9 @@ export const columnsAdmin: ColumnDef<Song>[] = [
     cell: ({row, getValue}) => {
       const onDelete = () => {
         const deleteSongToast = toast({
-          title: "เซิร์ฟเวอร์",
-          description: "กำลังลบเพลง",
-          duration: 1000,
+          title: "กำลังลบเพลง",
+          description: "รอสักครู่...",
+          duration: 10000,
         });
 
         const id = getValue();
@@ -98,14 +98,23 @@ export const columnsAdmin: ColumnDef<Song>[] = [
 
         fetchDelete()
           .then(() => {
-            deleteSongToast.dismiss();
+            deleteSongToast.update({
+              ...deleteSongToast,
+              title: "สำเร็จ!",
+              description: "ลบเพลงเรียบร้อยแล้ว",
+            });
           })
           .catch(() => {
-            deleteSongToast.dismiss();
-            toast({
+            deleteSongToast.update({
+              ...deleteSongToast,
               title: "โอ๊ะ!",
               description: "ลบเพลงไม่ได้ มีปัญหานิดหน่อย",
               variant: "destructive",
+            });
+          })
+          .finally(() => {
+            deleteSongToast.update({
+              ...deleteSongToast,
               duration: 1000,
             });
           });

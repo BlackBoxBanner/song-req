@@ -5,6 +5,7 @@ import {socket} from "@/lib/socket";
 import {toast} from "../ui/use-toast";
 import {FormEvent, useEffect, useState} from "react";
 import {updateCurrentSong} from "@/lib/updateCurrentSong";
+import {delay} from "../basic/delay";
 
 export const ClearSongForm = () => {
   const [isConnected, setIsConnected] = useState(false);
@@ -29,19 +30,16 @@ export const ClearSongForm = () => {
   const onClearSong = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const deleteToast = toast({
-      title: "กำลังลบ",
-      description: "ระบบกำลังลบเพลง รอสักครู่",
-      duration: 1000,
-    });
-
-    const updateToast = toast({
-      title: "กำลังอัพเดท",
-      description: "ระบบกำลังอัพเดทเพลง รอสักครู่",
-      duration: 1000,
+    const toastContent = toast({
+      duration: 10000,
     });
 
     try {
+      toastContent.update({
+        ...toastContent,
+        title: "กำลังลบ",
+        description: "ระบบกำลังลบเพลง รอสักครู่",
+      });
       const res = await fetch(`/api/song`, {
         method: "DELETE",
         body: JSON.stringify({all: true}),
@@ -51,16 +49,22 @@ export const ClearSongForm = () => {
       socket.emit("send-song", data);
     } catch (error) {
       console.error("Error clearing songs:", error);
-    } finally {
-      deleteToast.dismiss();
+      toastContent.dismiss();
     }
 
     try {
+      toastContent.update({
+        ...toastContent,
+        title: "กำลังอัพเดท",
+        description: "ระบบกำลังอัพเดทเพลง รอสักครู่",
+      });
       await updateCurrentSong();
     } catch (error) {
       console.error("Error updating current song:", error);
     } finally {
-      updateToast.dismiss();
+      delay(750).then(() => {
+        toastContent.dismiss();
+      });
     }
   };
 

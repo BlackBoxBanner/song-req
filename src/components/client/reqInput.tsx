@@ -4,61 +4,47 @@ import {socket} from "@/lib/socket";
 import {FormEvent, useEffect, useRef, useState} from "react";
 import {Button} from "../ui/button";
 import {Input} from "../ui/input";
-import {toast} from "../ui/use-toast";
+import {useToast} from "../ui/use-toast";
+import {useSocketInit} from "../context/socketContext";
+import {delay} from "../basic/delay";
 
 const RequestSongInputForm = () => {
-  const [isConnected, setIsConnected] = useState(false);
+  const {socketInit} = useSocketInit();
   const [songName, setSongName] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {
-    const onConnect = () => {
-      setIsConnected(true);
-      toast({
-        title: "เชื่อมต่อสำเร็จ",
-        description: "คุณเชื่อมต่อกับเซิร์ฟเวอร์แล้ว",
-        duration: 1000,
-      });
-    };
-
-    const onDisconnect = () => {
-      setIsConnected(false);
-      toast({
-        title: "การเชื่อมต่อขาดหาย",
-        description: "ระบบไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
-        variant: "destructive",
-        duration: 1000,
-      });
-    };
-
-    if (socket.connected) {
-      onConnect();
-    }
-
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
-
-    return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
-    };
-  }, []);
+  const {toast} = useToast();
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!isConnected) return;
+    if (!socketInit) return;
+
+    const toastContent = toast({
+      duration: 100000,
+    });
+
+    toastContent.update({
+      ...toastContent,
+      title: "กำลังดำเนินการ",
+      description: "กำลังส่งชื่อเพลง",
+      variant: "default",
+    });
 
     if (!songName.trim()) {
-      toast({
+      toastContent.update({
+        ...toastContent,
         title: "ข้อผิดพลาด",
         description: "กรุณากรอกชื่อเพลง",
         variant: "destructive",
         duration: 1000,
       });
+
       return;
     }
 
     try {
+      setIsSubmitting(true);
       const res = await fetch("/api/song", {
         method: "POST",
         headers: {
@@ -70,7 +56,13 @@ const RequestSongInputForm = () => {
       });
 
       if (!res.ok) {
-        throw new Error("การขอเพลงล้มเหลว");
+        toastContent.update({
+          ...toastContent,
+          title: "ข้อผิดพลาด",
+          description: "การขอเพลงล้มเหลว",
+          variant: "default",
+          duration: 3000,
+        });
       }
 
       const data = await res.json();
@@ -78,19 +70,23 @@ const RequestSongInputForm = () => {
       setSongName("");
       inputRef.current?.focus();
 
-      toast({
+      toastContent.update({
+        ...toastContent,
         title: "ขอเพลงสำเร็จ",
         description: "เพลงของคุณถูกขอเรียบร้อยแล้ว",
+        variant: "default",
         duration: 1000,
       });
     } catch (error) {
-      toast({
+      toastContent.update({
+        ...toastContent,
         title: "เกิดข้อผิดพลาด",
         description: "บางอย่างผิดพลาด",
         variant: "destructive",
         duration: 1000,
       });
     } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -100,9 +96,11 @@ const RequestSongInputForm = () => {
         ref={inputRef}
         value={songName}
         onChange={(e) => setSongName(e.target.value)}
-        placeholder="ชื่อเพลง ..."
+        placeholder="ชื่อเพลง..."
       />
-      <Button type="submit" disabled={!isConnected || !songName.trim()}>
+      <Button
+        type="submit"
+        disabled={!socketInit || !songName.trim() || isSubmitting}>
         ขอเพลง
       </Button>
     </form>
