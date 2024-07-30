@@ -13,9 +13,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Session {
+  id      String  @unique @default(uuid())
+  request Boolean @default(true)
+}
+
 model Song {
   id       String   @unique @default(uuid())
   title    String
   done     Boolean  @default(false)
+  delete   Boolean  @default(false)
   createAt DateTime @default(now())
 }

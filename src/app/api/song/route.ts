@@ -84,8 +84,11 @@ export const DELETE = async (request: NextRequest) => {
       await prisma.song.deleteMany();
       revalidateAllPaths();
     } else {
-      await prisma.song.delete({
+      await prisma.song.update({
         where: {id},
+        data: {
+          delete: true,
+        },
       });
     }
 

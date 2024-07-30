@@ -6,9 +6,12 @@ import {toast} from "../ui/use-toast";
 import {FormEvent, useEffect, useState} from "react";
 import {updateCurrentSong} from "@/lib/updateCurrentSong";
 import {delay} from "../basic/delay";
+import {useSessionInit} from "../context/sessionContext";
 
 export const ClearSongForm = () => {
   const [isConnected, setIsConnected] = useState(false);
+  const {sessionInit} = useSessionInit();
+  const [state, setState] = useState(false);
 
   useEffect(() => {
     const handleConnect = () => setIsConnected(true);
@@ -35,6 +38,7 @@ export const ClearSongForm = () => {
     });
 
     try {
+      setState(true);
       toastContent.update({
         ...toastContent,
         title: "กำลังลบ",
@@ -50,6 +54,8 @@ export const ClearSongForm = () => {
     } catch (error) {
       console.error("Error clearing songs:", error);
       toastContent.dismiss();
+    } finally {
+      setState(false);
     }
 
     try {
@@ -70,7 +76,7 @@ export const ClearSongForm = () => {
 
   return (
     <form onSubmit={onClearSong} className="flex flex-col gap-2 w-full">
-      <Button type="submit" disabled={!isConnected}>
+      <Button type="submit" disabled={!isConnected || !sessionInit || state}>
         เคลียลิสต์เพลง
       </Button>
     </form>

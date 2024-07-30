@@ -18,6 +18,10 @@ app.prepare().then(() => {
     socket.on("send-song", (obj) => {
       io.emit("receive-song", obj);
     });
+
+    socket.on("send-session", (obj) => {
+      io.emit("receive-session", obj);
+    });
   });
 
   httpServer

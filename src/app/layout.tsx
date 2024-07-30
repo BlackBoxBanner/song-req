@@ -3,6 +3,7 @@ import {Maitree} from "next/font/google";
 import "./globals.css";
 import {Toaster} from "@/components/ui/toaster";
 import {SocketProvider} from "@/components/context/socketContext";
+import {SessionProvider} from "@/components/context/sessionContext";
 import InitSocket from "@/components/client/initSocket";
 
 const maitree = Maitree({
@@ -17,8 +18,6 @@ export const metadata: Metadata = {
   authors: [{name: "BlackBoxBanner"}],
   creator: "BlackBoxBanner",
   applicationName: "ขอเพลง",
-  themeColor: "#FFFFFF", // or any color that fits your theme
-  viewport: "width=device-width, initial-scale=1",
 };
 
 export default function RootLayout({
@@ -31,8 +30,10 @@ export default function RootLayout({
       <body className={maitree.className}>
         <Toaster />
         <SocketProvider>
-          <InitSocket />
-          {children}
+          <SessionProvider>
+            <InitSocket />
+            {children}
+          </SessionProvider>
         </SocketProvider>
       </body>
     </html>

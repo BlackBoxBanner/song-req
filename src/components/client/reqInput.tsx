@@ -7,12 +7,16 @@ import {Input} from "../ui/input";
 import {useToast} from "../ui/use-toast";
 import {useSocketInit} from "../context/socketContext";
 import {delay} from "../basic/delay";
+import {cn} from "@/lib/utils";
+import InfiniteText from "../basic/infiniteText";
+import {useSessionInit} from "../context/sessionContext";
 
 const RequestSongInputForm = () => {
   const {socketInit} = useSocketInit();
   const [songName, setSongName] = useState<string>("");
   const inputRef = useRef<HTMLInputElement>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const {sessionInit} = useSessionInit();
 
   const {toast} = useToast();
 
@@ -91,19 +95,31 @@ const RequestSongInputForm = () => {
   };
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-2 w-full">
-      <Input
-        ref={inputRef}
-        value={songName}
-        onChange={(e) => setSongName(e.target.value)}
-        placeholder="ชื่อเพลง..."
-      />
-      <Button
-        type="submit"
-        disabled={!socketInit || !songName.trim() || isSubmitting}>
-        ขอเพลง
-      </Button>
-    </form>
+    <section
+      className={cn(
+        "flex justify-center items-center sticky bottom-0 bg-background border-t",
+        !sessionInit || !sessionInit.request ? "py-4" : "p-4"
+      )}>
+      {!sessionInit ? (
+        <InfiniteText text="ยังไม่เปิด" />
+      ) : !sessionInit.request ? (
+        <InfiniteText text="การขอเพลงได้ถูกระงับโดยผู้ดูแล" />
+      ) : (
+        <form onSubmit={onSubmit} className="flex flex-col gap-2 w-full">
+          <Input
+            ref={inputRef}
+            value={songName}
+            onChange={(e) => setSongName(e.target.value)}
+            placeholder="ชื่อเพลง..."
+          />
+          <Button
+            type="submit"
+            disabled={!socketInit || !songName.trim() || isSubmitting}>
+            ขอเพลง
+          </Button>
+        </form>
+      )}
+    </section>
   );
 };
 

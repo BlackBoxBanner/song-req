@@ -3,8 +3,9 @@
 import {Song} from "@prisma/client";
 import {useEffect, useState} from "react";
 import {columns, columnsAdmin} from "./column";
-import {DataTable} from "./data-table";
+// import {DataTable} from "./data-table";
 import {socket} from "@/lib/socket";
+import DataTable from "./dataTable";
 
 type SongListProps = {
   type?: "admin" | "user";
@@ -27,11 +28,9 @@ const SongList = ({type: userType = "user", initData = []}: SongListProps) => {
     };
   }, []);
 
-  const columnsToUse = userType === "admin" ? columnsAdmin : columns;
-
   return (
     <section className="w-full h-full p-4">
-      <DataTable columns={columnsToUse} data={songs} />
+      <DataTable songs={songs} admin={userType == "admin"} />
     </section>
   );
 };
