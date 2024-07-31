@@ -1,8 +1,10 @@
 const InfiniteText = ({text = "ตัวอย่าง"}: {text: string}) => {
-  const items = Array(10).fill(text);
+  const items = Array(15).fill(text);
 
   return (
-    <div className="w-full inline-flex flex-nowrap overflow-hidden">
+    <div className="w-full inline-flex flex-nowrap overflow-hidden relative">
+      <span className="bg-gradient-to-r from-background via-background/90 to-transparent absolute top-0 left-0  h-full w-[6rem] z-10" />
+      <span className="bg-gradient-to-l from-background via-background/90 to-transparent absolute top-0 right-0  h-full w-[6rem] z-10" />
       {["", ' aria-hidden="true"'].map((aria, index) => (
         <ul
           key={index}
