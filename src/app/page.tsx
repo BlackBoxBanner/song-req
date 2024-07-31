@@ -5,7 +5,7 @@ import prisma from "@/lib/prisma";
 import {cn} from "@/lib/utils";
 
 export default async function Home() {
-  const song = await prisma.song.findMany({
+  const songs = await prisma.song.findMany({
     orderBy: {
       createAt: "asc",
     },
@@ -19,13 +19,11 @@ export default async function Home() {
         </div>
         <section
           className={cn("flex justify-center items-center overflow-clip px-0")}>
-          <SongList initData={song} />
+          <SongList initData={songs} />
         </section>
         <RequestSongInputForm />
       </section>
-      {/* <section className="bg-primary min-h-dvh text-primary-foreground snap-start">
-        test
-      </section> */}
+      {/* Additional sections can be added here */}
     </main>
   );
 }

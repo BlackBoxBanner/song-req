@@ -2,14 +2,13 @@
 
 import {socket} from "@/lib/socket";
 import {FormEvent, useEffect, useRef, useState} from "react";
-import {Button} from "../ui/button";
-import {Input} from "../ui/input";
-import {useToast} from "../ui/use-toast";
-import {useSocketInit} from "../context/socketContext";
-import {delay} from "../basic/delay";
+import {Button} from "@/components/ui/button";
+import {Input} from "@/components/ui/input";
+import {useToast} from "@/components/ui/use-toast";
+import {useSocketInit} from "@/components/context/socketContext";
 import {cn} from "@/lib/utils";
-import InfiniteText from "../basic/infiniteText";
-import {useSessionInit} from "../context/sessionContext";
+import InfiniteText from "@/components/basic/infiniteText";
+import {useSessionInit} from "@/components/context/sessionContext";
 
 const RequestSongInputForm = () => {
   const {socketInit} = useSocketInit();

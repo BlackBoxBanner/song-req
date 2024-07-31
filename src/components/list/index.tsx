@@ -2,10 +2,8 @@
 
 import {Song} from "@prisma/client";
 import {useEffect, useState} from "react";
-import {columns, columnsAdmin} from "./column";
-// import {DataTable} from "./data-table";
 import {socket} from "@/lib/socket";
-import DataTable from "./dataTable";
+import DataTable from "@/components/list/dataTable";
 
 type SongListProps = {
   type?: "admin" | "user";

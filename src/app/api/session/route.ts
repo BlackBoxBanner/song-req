@@ -1,29 +1,27 @@
 import prisma from "@/lib/prisma";
-import {Session} from "@prisma/client";
 import {revalidatePath} from "next/cache";
 import {NextRequest, NextResponse} from "next/server";
+import {Session} from "@prisma/client";
 
 const revalidateAllPaths = () => {
   revalidatePath("/");
   revalidatePath("/admin");
 };
 
+// GET: Fetch all sessions
 export const GET = async () => {
   try {
-    const session = await prisma.session.findMany();
-
-    return NextResponse.json(session);
+    const sessions = await prisma.session.findMany();
+    return NextResponse.json(sessions);
   } catch (err) {
-    return NextResponse.json(
-      {error: err || "Internal Server Error"},
-      {status: 500}
-    );
+    console.error("Error fetching sessions:", err);
+    return NextResponse.json({error: "Internal Server Error"}, {status: 500});
   }
 };
 
+// POST: Create a new session
 export const POST = async (_request: NextRequest) => {
   try {
-    // Provide valid data for session creation
     const newSession = await prisma.session.create({
       data: {
         // Define necessary fields here, e.g., someField: someValue
@@ -41,18 +39,19 @@ export const POST = async (_request: NextRequest) => {
   }
 };
 
+// PATCH: Update an existing session
 export const PATCH = async (request: NextRequest) => {
   try {
-    const body = (await request.json()) as Pick<Session, "id" | "request">;
+    const {id, request: requestField} =
+      (await request.json()) as Partial<Session>;
 
-    // Ensure the request body has necessary data
-    if (!body.id || body.request === undefined) {
+    if (!id || requestField === undefined) {
       return NextResponse.json({error: "Invalid request data"}, {status: 400});
     }
 
     const updatedSession = await prisma.session.update({
-      where: {id: body.id},
-      data: {request: body.request},
+      where: {id},
+      data: {request: requestField},
     });
 
     revalidateAllPaths();
@@ -66,17 +65,18 @@ export const PATCH = async (request: NextRequest) => {
   }
 };
 
+// DELETE: Delete all sessions and songs
 export const DELETE = async (_request: NextRequest) => {
   try {
-    await prisma.session.deleteMany(); // Perform deletion
-    await prisma.song.deleteMany(); // Perform deletion
-    revalidateAllPaths(); // Trigger revalidation of all paths
+    await prisma.session.deleteMany();
+    await prisma.song.deleteMany();
 
+    revalidateAllPaths();
     return NextResponse.json(null);
-  } catch (err: any) {
-    console.error("Failed to delete sessions:", err);
+  } catch (err) {
+    console.error("Failed to delete sessions and songs:", err);
     return NextResponse.json(
-      {error: "Failed to delete sessions."},
+      {error: "Failed to delete sessions and songs."},
       {status: 500}
     );
   }

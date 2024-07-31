@@ -1,13 +1,13 @@
 "use client";
 
-import {Button} from "../ui/button";
+import {Button} from "@/components/ui/button";
 import {socket} from "@/lib/socket";
-import {toast} from "../ui/use-toast";
+import {toast} from "@/components/ui/use-toast";
 import {FormEvent, useEffect, useState} from "react";
 import {updateCurrentSong} from "@/lib/updateCurrentSong";
-import {delay} from "../basic/delay";
+import {delay} from "@/components/basic/delay";
 import {Session} from "@prisma/client";
-import {useSessionInit} from "../context/sessionContext";
+import {useSessionInit} from "@/components/context/sessionContext";
 import {CheckIcon, Cross1Icon} from "@radix-ui/react-icons";
 
 export const ToggleSongRequestForm = () => {

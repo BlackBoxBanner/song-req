@@ -1,16 +1,20 @@
 "use client";
 
-import {useSessionInit} from "../context/sessionContext";
-import InfiniteText from "./infiniteText";
+import {useSessionInit} from "@/components/context/sessionContext";
+import InfiniteText from "@/components/basic/infiniteText";
 
 const AdminFooter = () => {
   const {sessionInit} = useSessionInit();
 
-  return !sessionInit ? (
-    <InfiniteText text="ยังไม่เปิด" />
-  ) : !sessionInit.request ? (
-    <InfiniteText text="การขอเพลงได้ถูกระงับโดยผู้ดูแล" />
-  ) : null;
+  if (!sessionInit) {
+    return <InfiniteText text="ยังไม่เปิด" />;
+  }
+
+  if (!sessionInit.request) {
+    return <InfiniteText text="การขอเพลงได้ถูกระงับโดยผู้ดูแล" />;
+  }
+
+  return null;
 };
 
 export default AdminFooter;

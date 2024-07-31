@@ -1,10 +1,10 @@
 "use client";
 
 import {socket} from "@/lib/socket";
-import {useSocketInit} from "../context/socketContext";
-import {toast} from "../ui/use-toast";
+import {useSocketInit} from "@/components/context/socketContext";
+import {toast} from "@/components/ui/use-toast";
 import {useEffect} from "react";
-import {delay} from "../basic/delay";
+import {delay} from "@/components/basic/delay";
 
 const InitSocket = () => {
   const {setSocketInit} = useSocketInit();

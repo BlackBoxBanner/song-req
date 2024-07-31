@@ -7,69 +7,52 @@ const revalidateAllPaths = () => {
   revalidatePath("/admin");
 };
 
+const fetchAllSongs = async () => {
+  return await prisma.song.findMany({orderBy: {createAt: "asc"}});
+};
+
 export const GET = async () => {
   try {
-    const songs = await prisma.song.findMany({
-      orderBy: {
-        createAt: "asc",
-      },
-    });
+    const songs = await fetchAllSongs();
     return NextResponse.json(songs);
-  } catch (err: any) {
-    throw new Error(err);
+  } catch (err) {
+    console.error("Error fetching songs:", err);
+    return NextResponse.json({error: "Internal Server Error"}, {status: 500});
   }
 };
 
 export const POST = async (request: NextRequest) => {
   try {
-    const body = (await request.json()) as {title: string};
+    const {title} = (await request.json()) as {title: string};
 
-    await prisma.song.create({
-      data: {
-        title: body.title,
-      },
-    });
-
+    await prisma.song.create({data: {title}});
     revalidateAllPaths();
 
-    const allSongs = await prisma.song.findMany({
-      orderBy: {
-        createAt: "asc",
-      },
-    });
+    const allSongs = await fetchAllSongs();
     return NextResponse.json(allSongs);
-  } catch (err: any) {
-    throw new Error(err);
+  } catch (err) {
+    console.error("Error creating song:", err);
+    return NextResponse.json({error: "Failed to create song"}, {status: 500});
   }
 };
 
 export const PATCH = async (request: NextRequest) => {
   try {
-    const body = (await request.json()) as {id: string};
+    const {id} = (await request.json()) as {id: string};
 
-    const song = await prisma.song.findUnique({
-      where: {id: body.id},
-    });
-
-    if (song) {
-      await prisma.song.update({
-        where: {id: body.id},
-        data: {done: !song.done},
-      });
-
-      revalidateAllPaths();
-
-      const allSongs = await prisma.song.findMany({
-        orderBy: {
-          createAt: "asc",
-        },
-      });
-      return NextResponse.json(allSongs);
-    } else {
-      throw new Error("Song not found");
+    const song = await prisma.song.findUnique({where: {id}});
+    if (!song) {
+      return NextResponse.json({error: "Song not found"}, {status: 404});
     }
-  } catch (err: any) {
-    throw new Error(err);
+
+    await prisma.song.update({where: {id}, data: {done: !song.done}});
+    revalidateAllPaths();
+
+    const allSongs = await fetchAllSongs();
+    return NextResponse.json(allSongs);
+  } catch (err) {
+    console.error("Error updating song:", err);
+    return NextResponse.json({error: "Failed to update song"}, {status: 500});
   }
 };
 
@@ -82,25 +65,18 @@ export const DELETE = async (request: NextRequest) => {
 
     if (all) {
       await prisma.song.deleteMany();
-      revalidateAllPaths();
     } else {
-      await prisma.song.update({
-        where: {id},
-        data: {
-          delete: true,
-        },
-      });
+      await prisma.song.update({where: {id}, data: {delete: true}});
     }
-
     revalidateAllPaths();
 
-    const allSongs = await prisma.song.findMany({
-      orderBy: {
-        createAt: "asc",
-      },
-    });
+    const allSongs = await fetchAllSongs();
     return NextResponse.json(allSongs);
-  } catch (err: any) {
-    throw new Error(err);
+  } catch (err) {
+    console.error("Error deleting song:", err);
+    return NextResponse.json(
+      {error: "Failed to delete song(s)"},
+      {status: 500}
+    );
   }
 };

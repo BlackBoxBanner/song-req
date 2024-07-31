@@ -1,13 +1,13 @@
-import SongList from "@/components/list/index";
 import prisma from "@/lib/prisma";
 import {cn} from "@/lib/utils";
+import SongList from "@/components/list/index";
 import {
   Drawer,
-  DrawerClose,
-  DrawerContent,
-  DrawerFooter,
-  DrawerHeader,
   DrawerTrigger,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerClose,
 } from "@/components/ui/drawer";
 import {Button} from "@/components/ui/button";
 import AdminSetting from "@/components/basic/adminSetting";
@@ -15,10 +15,8 @@ import AdminSessionController from "@/components/basic/adminSessionControl";
 import AdminFooter from "@/components/basic/adminFooter";
 
 const AdminPage = async () => {
-  const song = await prisma.song.findMany({
-    orderBy: {
-      createAt: "asc",
-    },
+  const songs = await prisma.song.findMany({
+    orderBy: {createAt: "asc"},
   });
 
   return (
@@ -35,7 +33,7 @@ const AdminPage = async () => {
             <DrawerHeader />
             <AdminSetting />
             <DrawerFooter>
-              <DrawerClose>
+              <DrawerClose asChild>
                 <Button variant="outline" className="w-full">
                   ปิดหน้าต่างนี้
                 </Button>
@@ -47,8 +45,9 @@ const AdminPage = async () => {
 
       <section
         className={cn("flex justify-center items-center px-0 overflow-clip")}>
-        <SongList initData={song} type="admin" />
+        <SongList initData={songs} type="admin" />
       </section>
+
       <AdminFooter />
     </main>
   );
