@@ -1,9 +1,8 @@
-import type {Metadata} from "next";
-import {Maitree} from "next/font/google";
+import type { Metadata } from "next";
+import { Maitree } from "next/font/google";
 import "./globals.css";
-import {Toaster} from "@/components/ui/toaster";
-import {SocketProvider} from "@/components/context/socketContext";
-import {SessionProvider} from "@/components/context/sessionContext";
+import { Toaster } from "@/components/ui/toaster";
+import { SocketProvider } from "@/components/context/socketContext";
 import InitSocket from "@/components/client/initSocket";
 
 const maitree = Maitree({
@@ -15,21 +14,23 @@ export const metadata: Metadata = {
   title: "ขอเพลง",
   description: "แอปพลิเคชันสำหรับขอเพลงขณะไลฟ์สด",
   keywords: ["ขอเพลง", "ไลฟ์สด", "เพลง", "แอปพลิเคชัน"],
-  authors: [{name: "BlackBoxBanner"}],
+  authors: [{ name: "BlackBoxBanner" }],
   creator: "BlackBoxBanner",
   applicationName: "ขอเพลง",
 };
 
-export default function RootLayout({children}: {children: React.ReactNode}) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="th">
       <body className={maitree.className}>
         <Toaster />
         <SocketProvider>
-          <SessionProvider>
-            <InitSocket />
-            {children}
-          </SessionProvider>
+          <InitSocket />
+          {children}
         </SocketProvider>
       </body>
     </html>

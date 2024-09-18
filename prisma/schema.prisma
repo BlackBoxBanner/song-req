@@ -13,9 +13,32 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id       String   @unique @default(uuid())
+  name     String   @unique
+  password String
+  Domain   Domain?
+  Session  Session?
+  Song     Song[]
+}
+
+model Domain {
+  id       String   @unique @default(uuid())
+  url      String
+  userId   String   @unique
+  createAt DateTime @default(now())
+
+  User User @relation(fields: [userId], references: [id])
+}
+
 model Session {
   id      String  @unique @default(uuid())
   request Boolean @default(true)
+  limit   Int     @default(10)
+
+  userId String @unique
+  User   User   @relation(fields: [userId], references: [id])
+  Song   Song[]
 }
 
 model Song {
@@ -24,4 +47,10 @@ model Song {
   done     Boolean  @default(false)
   delete   Boolean  @default(false)
   createAt DateTime @default(now())
+
+  userId String
+  User   User   @relation(fields: [userId], references: [id])
+
+  sessionId String
+  session   Session @relation(fields: [sessionId], references: [id])
 }

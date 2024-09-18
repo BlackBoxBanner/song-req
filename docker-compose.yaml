@@ -1,0 +1,18 @@
+version: "3.1"
+
+services:
+  db:
+    image: mariadb:latest
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: rootpassword # You can change this as necessary
+      MARIADB_DATABASE: database # Set the name of the initial database
+      MARIADB_USER: user # Set the non-root username
+      MARIADB_PASSWORD: password # Set the non-root user's password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
