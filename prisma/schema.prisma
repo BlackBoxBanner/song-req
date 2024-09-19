@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,13 +7,61 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model Account {
+  id                String  @id @default(cuid())
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique @map("session_token")
+  userId       String   @map("user_id")
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
 model User {
-  id       String   @unique @default(uuid())
-  name     String   @unique
-  password String
-  Domain   Domain?
-  Session  Session?
-  Song     Song[]
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  username      String?   @unique
+  password      String?
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  Domain      Domain?
+  LiveSession LiveSession?
+  Song        Song[]
+
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verificationtokens")
 }
 
 model Domain {
@@ -31,7 +73,7 @@ model Domain {
   User User @relation(fields: [userId], references: [id])
 }
 
-model Session {
+model LiveSession {
   id      String  @unique @default(uuid())
   request Boolean @default(true)
   limit   Int     @default(10)
@@ -52,5 +94,5 @@ model Song {
   User   User   @relation(fields: [userId], references: [id])
 
   sessionId String
-  session   Session @relation(fields: [sessionId], references: [id])
+  session   LiveSession @relation(fields: [sessionId], references: [id])
 }
