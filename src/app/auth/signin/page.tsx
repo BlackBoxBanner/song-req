@@ -1,4 +1,4 @@
-import RegisterForm from "@/components/client/registerForm";
+import SignInForm from "@/components/client/signinForm";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
@@ -9,10 +9,10 @@ const LoginPage = () => {
     >
       <Card className="w-full max-w-96 m-2">
         <CardHeader>
-          <CardTitle>Register</CardTitle>
+          <CardTitle>Login</CardTitle>
         </CardHeader>
         <CardContent>
-          <RegisterForm />
+          <SignInForm />
         </CardContent>
       </Card>
     </main>
