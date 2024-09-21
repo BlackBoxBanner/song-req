@@ -9,7 +9,7 @@ import * as bcrypt from "bcryptjs";
 import { permanentRedirect } from "next/navigation";
 
 export const authenticate = async (
-  values: SignInFormValues,
+  values: SignInFormValues
 ): Promise<ActionResponse> => {
   try {
     // Sign in without redirecting
@@ -58,6 +58,7 @@ export const registerAction = async ({
 
     await prisma.user.create({
       data: {
+        name: username,
         username,
         password: await bcrypt.hash(password, 10),
       },

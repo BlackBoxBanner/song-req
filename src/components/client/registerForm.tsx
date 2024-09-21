@@ -14,7 +14,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { registerAction } from "@/components/action/auth";
-import { useToast } from "../ui/use-toast";
+import { useToast } from "@/components/ui/use-toast";
+import { delay } from "@/components/basic/delay";
+import { useRouter } from "next/navigation";
 
 export const registerSchema = z
   .object({
@@ -42,6 +44,7 @@ const RegisterForm = () => {
   });
 
   const { toast } = useToast();
+  const router = useRouter();
 
   async function onSubmit(values: RegisterFormValues) {
     try {
@@ -52,6 +55,10 @@ const RegisterForm = () => {
       toast({
         title: "Success",
         description: "User registered successfully",
+      });
+
+      delay(300).then(() => {
+        router.push("/auth/signin");
       });
     } catch (error: unknown) {
       if (error instanceof Error) {
