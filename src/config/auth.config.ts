@@ -14,8 +14,9 @@ const getUser = async (username: string) => {
 export default {
   callbacks: {
     authorized: async ({ auth }) => {
+      
       // Logged in users are authenticated, otherwise redirect to login page
-      return !!auth;
+      return !!auth
     },
     async redirect({ url, baseUrl }) {
       // Allows relative callback URLs
