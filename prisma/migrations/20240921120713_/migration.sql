@@ -37,6 +37,8 @@ CREATE TABLE `users` (
     `password` VARCHAR(191) NULL,
     `email_verified` DATETIME(3) NULL,
     `image` VARCHAR(191) NULL,
+    `limit` INTEGER NOT NULL DEFAULT 10,
+    `live` BOOLEAN NOT NULL DEFAULT false,
 
     UNIQUE INDEX `users_email_key`(`email`),
     UNIQUE INDEX `users_username_key`(`username`),
@@ -64,17 +66,6 @@ CREATE TABLE `Domain` (
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 -- CreateTable
-CREATE TABLE `LiveSession` (
-    `id` VARCHAR(191) NOT NULL,
-    `request` BOOLEAN NOT NULL DEFAULT true,
-    `limit` INTEGER NOT NULL DEFAULT 10,
-    `userId` VARCHAR(191) NOT NULL,
-
-    UNIQUE INDEX `LiveSession_id_key`(`id`),
-    UNIQUE INDEX `LiveSession_userId_key`(`userId`)
-) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
--- CreateTable
 CREATE TABLE `Song` (
     `id` VARCHAR(191) NOT NULL,
     `title` VARCHAR(191) NOT NULL,
@@ -82,7 +73,6 @@ CREATE TABLE `Song` (
     `delete` BOOLEAN NOT NULL DEFAULT false,
     `createAt` DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
     `userId` VARCHAR(191) NOT NULL,
-    `sessionId` VARCHAR(191) NOT NULL,
 
     UNIQUE INDEX `Song_id_key`(`id`)
 ) DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -97,10 +87,4 @@ ALTER TABLE `sessions` ADD CONSTRAINT `sessions_user_id_fkey` FOREIGN KEY (`user
 ALTER TABLE `Domain` ADD CONSTRAINT `Domain_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE `LiveSession` ADD CONSTRAINT `LiveSession_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
 ALTER TABLE `Song` ADD CONSTRAINT `Song_userId_fkey` FOREIGN KEY (`userId`) REFERENCES `users`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE `Song` ADD CONSTRAINT `Song_sessionId_fkey` FOREIGN KEY (`sessionId`) REFERENCES `LiveSession`(`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
