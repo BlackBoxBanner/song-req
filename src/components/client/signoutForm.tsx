@@ -8,7 +8,7 @@ const SignOutButton = () => {
   };
   return (
     <form action={signOutAction}>
-      <Button className="w-full" type="submit">
+      <Button className="w-full" type="submit" variant={"secondary"}>
         Sign Out
       </Button>
     </form>

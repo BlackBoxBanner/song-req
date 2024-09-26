@@ -45,12 +45,13 @@ model User {
   password      String?
   emailVerified DateTime? @map("email_verified")
   image         String?
+  limit         Int      @default(10)
+  live          Boolean   @default(false)
   accounts      Account[]
   sessions      Session[]
 
-  Domain      Domain?
-  LiveSession LiveSession?
-  Song        Song[]
+  Domain Domain?
+  Song   Song[]
 
   @@map("users")
 }
@@ -73,16 +74,6 @@ model Domain {
   User User @relation(fields: [userId], references: [id])
 }
 
-model LiveSession {
-  id      String  @unique @default(uuid())
-  request Boolean @default(true)
-  limit   Int     @default(10)
-
-  userId String @unique
-  User   User   @relation(fields: [userId], references: [id])
-  Song   Song[]
-}
-
 model Song {
   id       String   @unique @default(uuid())
   title    String
@@ -92,7 +83,4 @@ model Song {
 
   userId String
   User   User   @relation(fields: [userId], references: [id])
-
-  sessionId String
-  session   LiveSession @relation(fields: [sessionId], references: [id])
 }

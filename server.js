@@ -22,6 +22,10 @@ app.prepare().then(() => {
     socket.on("send-session", (obj) => {
       io.emit("receive-session", obj);
     });
+
+    socket.on("send-limit", (obj) => {
+      io.emit("receive-limit", obj);
+    });
   });
 
   httpServer

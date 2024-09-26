@@ -22,10 +22,10 @@ const sendData = <T>(
 // Custom hook to receive data
 const useReceiveData = <T>(
   eventName: string,
-  defaultData: T | null = null,
+  defaultData: T,
   socket: Socket = socketInstance // Use default socket if not provided
 ) => {
-  const [receivedData, setReceivedData] = useState<T | null>(defaultData);
+  const [receivedData, setReceivedData] = useState<T>(defaultData);
 
   useEffect(() => {
     if (!socket || !eventName) {
