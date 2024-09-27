@@ -17,6 +17,9 @@ export const requestSongAction = async ({
         username: name,
       },
     },
+    orderBy: {
+      createAt: "asc",
+    },
   });
 
   if (songList.length >= songLimit) {
@@ -39,6 +42,9 @@ export const requestSongAction = async ({
       User: {
         username: name,
       },
+    },
+    orderBy: {
+      createAt: "asc",
     },
   });
 };

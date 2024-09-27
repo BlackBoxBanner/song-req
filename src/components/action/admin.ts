@@ -9,6 +9,9 @@ export const getSongs = async (name: string) => {
         username: name,
       },
     },
+    orderBy: {
+      createAt: "asc",
+    },
   });
 };
 

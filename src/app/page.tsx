@@ -17,7 +17,7 @@ export default async function Home() {
         {/* Left side: Copyright */}
         <div className="text-center md:text-left">
           <p className="text-sm">
-            &copy; {new Date().getFullYear()} Your Name or Company. All rights
+            &copy; {new Date().getFullYear()} Sueksit Vachirakumthorn. All rights
             reserved.
           </p>
         </div>
