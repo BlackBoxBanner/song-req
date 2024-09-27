@@ -1,24 +1,11 @@
+import { getUser } from "@/components/action/admin";
 import SongRequestForm from "@/components/client/songRequestForm";
 import UserSongTable from "@/components/client/table/userSongTable";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
 const LivePage = async ({ params }: { params: { name: string } }) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      username: params.name,
-      Song: {
-        every: {
-          delete: false,
-        },
-      },
-    },
-    select: {
-      live: true,
-      limit: true,
-      Song: true,
-    },
-  });
+  const user = await getUser(params.name, true);
 
   if (!user) return redirect("/");
 

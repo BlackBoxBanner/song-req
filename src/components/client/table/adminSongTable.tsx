@@ -34,7 +34,6 @@ const AdminSongTable = ({ songs: initialSong }: AdminSongTableProps) => {
           <TableRow>
             <TableHead className="w-[40px]"></TableHead>
             <TableHead>Name</TableHead>
-            <TableHead className="w-[0px]"></TableHead>
             <TableHead className="text-right">Timestamp</TableHead>
             <TableHead className="w-[30px]"></TableHead>
           </TableRow>
@@ -43,20 +42,12 @@ const AdminSongTable = ({ songs: initialSong }: AdminSongTableProps) => {
           {songs?.map((song, index) => (
             <TableRow
               key={song.title + index}
-              className={cn("relative", song.done && "bg-neutral-100")}
+              className={cn(song.done && "bg-neutral-100 ")}
             >
               <TableCell className="font-medium">{index + 1}</TableCell>
               <TableCell>{song.title}</TableCell>
-              <TableCell>
-                <span
-                  className={cn(
-                    "absolute left-0 top-1/2 -translate-y-1/2 h-[1px] bg-primary w-full rounded opacity-0",
-                    song.done && "opacity-100"
-                  )}
-                />
-              </TableCell>
               <TableCell className="text-right">
-                {format(song.createAt, "HH:mm:ss")}
+                {format(song.createAt, "HH:mm:ss:SS")}
               </TableCell>
               <TableCell className="flex justify-start items-center">
                 <Checkbox

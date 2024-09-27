@@ -31,7 +31,11 @@ export const getUser = async (name: string, withSong: boolean = false) => {
       name: true,
       limit: true,
       live: true,
-      Song: withSong,
+      Song: {
+        orderBy: {
+          createAt: "asc",
+        },
+      },
     },
   });
 };
@@ -95,6 +99,9 @@ export const editSong = async (song: { id: string; done: boolean }) => {
   const allSongs = await prisma.song.findMany({
     where: {
       userId: changedSong.userId,
+    },
+    orderBy: {
+      createAt: "asc",
     },
   });
 
