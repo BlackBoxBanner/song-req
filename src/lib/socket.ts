@@ -16,6 +16,11 @@ const joinRoom = (roomName: string) => {
   sendData("join-room", roomName); // Emit the room name to the server
 };
 
+// Utility function to leave a room
+const leaveRoom = (roomName: string) => {
+  sendData("leave-room", roomName); // Emit the room name to the server
+};
+
 // Utility function to send data through socket
 const sendData = <T>(
   eventName: string,
@@ -90,6 +95,7 @@ const useSocketConnection = (socket: Socket = socketInstance) => {
 
 export {
   joinRoom,
+  leaveRoom,
   socketInstance as socket,
   sendData,
   useReceiveData,
