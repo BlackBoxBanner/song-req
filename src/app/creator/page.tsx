@@ -6,17 +6,23 @@ import SignOutButton from "@/components/client/signoutForm";
 import AdminSongTable from "@/components/client/table/adminSongTable";
 import { useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
-import { permanentRedirect } from "next/navigation";
+import { redirect } from "next/navigation"; // Use redirect for navigation handling
 
 const CreatorPage = async () => {
+  // Fetch the session from the server
   const session = await useSession();
 
-  const name = session.user?.name;
+  // If there's no session or the user's name is not present, redirect to the home page
+  if (!session?.user?.name) {
+    return redirect("/");
+  }
 
-  if (!name) return permanentRedirect("/");
+  const name = session.user.name;
 
+  // Fetch the user data based on the session name
   const user = await getUser(name, true);
 
+  // If the user doesn't exist, return null to avoid rendering the page
   if (!user) return null;
 
   return (
@@ -27,14 +33,25 @@ const CreatorPage = async () => {
         )}
       >
         <div className={cn("grid grid-cols-2 row-auto h-fit gap-2 p-2")}>
+          {/* Live status component */}
           <div className="col-span-2 grid grid-cols-2">
-            <LiveStatus live={user.live} />
+            <LiveStatus live={user.live} name={user.name} />
           </div>
+
+          {/* Sign out button */}
           <SignOutButton />
+
+          {/* Change live form */}
           <ChangeLiveForm name={user.name} live={user.live} />
+
+          {/* Delete all songs form */}
           <DeleteForm name={user.name} />
+
+          {/* Limit form */}
           <LimitForm name={user.name} limit={user.limit} />
         </div>
+
+        {/* Admin Song Table */}
         <div className="overflow-auto lg:h-dvh p-2 relative">
           <AdminSongTable songs={user.Song} name={user.name!} />
         </div>

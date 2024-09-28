@@ -23,7 +23,7 @@ const UserSongTable = ({ songs: initialSong }: UserSongTableProps) => {
     <>
       <Table>
         <TableHeader>
-          <TableRow className="sticky top-0 bg-background">
+          <TableRow className="sticky top-0 z-10 bg-background">
             <TableHead className="w-[40px]"></TableHead>
             <TableHead>Name</TableHead>
             <TableHead className="text-right">Timestamp</TableHead>
