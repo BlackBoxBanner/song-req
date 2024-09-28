@@ -60,7 +60,7 @@ interface LiveStatusProps {
   prefix?: string;
 }
 
-const LiveStatus = (props: LiveStatusProps) => {
+const LiveStatus = ({ prefix = "", ...props }: LiveStatusProps) => {
   const liveStatus = useReceiveData("receive-session", props.live);
 
   useEffect(() => {
@@ -84,7 +84,7 @@ const LiveStatus = (props: LiveStatusProps) => {
           : "bg-red-600 text-primary-foreground"
       )}
     >
-      {`${props.prefix} ${liveStatus ? "Live" : "Offline"}`}
+      {`${prefix} ${liveStatus ? "Live" : "Offline"}`}
     </p>
   );
 };
