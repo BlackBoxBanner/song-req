@@ -1,12 +1,16 @@
 "use server";
 
-import { signIn } from "@/lib/auth";
+import { signIn, signOut } from "@/lib/auth";
 import { SignInFormValues } from "@/components/client/signinForm";
 import { AuthError } from "next-auth";
 import { RegisterFormValues } from "@/components/client/registerForm";
 import prisma from "@/lib/prisma";
 import * as bcrypt from "bcryptjs";
-import { permanentRedirect } from "next/navigation";
+
+export const signOutAction = async () => {
+  "use server";
+  await signOut();
+};
 
 export const authenticate = async (
   values: SignInFormValues
