@@ -3,7 +3,7 @@ import prisma from "@/lib/prisma";
 import { User } from "@prisma/client";
 
 export const getSongs = async (name: string) => {
-  return await prisma.song.findMany({
+  return prisma.song.findMany({
     where: {
       User: {
         username: name,
@@ -43,29 +43,20 @@ export const getUser = async (name: string, withSong: boolean = false) => {
   });
 };
 
-export const changeLive = async ({ name }: Pick<User, "name">) => {
+export const changeLive = async ({
+  name,
+  live = false,
+}: Pick<User, "name" | "live">) => {
   if (!name) return;
-  const user = await getUser(name);
-
-  if (!user) return;
-
-  if (!user.live) {
-    await deleteSongs(name);
-  }
-
   return await prisma.user.update({
-    where: {
-      username: name,
-    },
+    where: { username: name },
     data: {
-      live: !user.live,
+      live: !live,
       Song: {
-        deleteMany: {},
+        deleteMany: [],
       },
     },
-    select: {
-      live: true,
-    },
+    select: { live: true },
   });
 };
 
@@ -73,19 +64,24 @@ export const setLimit = async ({
   name,
   limit,
 }: Pick<User, "name" | "limit">) => {
-  console.log(name, limit);
-
   if (!name) return;
-  await deleteSongs(name);
   return await prisma.user.update({
     where: {
       username: name,
     },
     data: {
       limit: Math.abs(limit),
+      Song: {
+        deleteMany: {},
+      },
     },
     select: {
       limit: true,
+      Song: {
+        orderBy: {
+          createAt: "asc",
+        },
+      },
     },
   });
 };

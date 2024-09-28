@@ -28,7 +28,10 @@ export default function RootLayout({
     <html lang="th">
       <body className={maitree.className}>
         <Toaster />
-        <SocketProvider>{children}</SocketProvider>
+        <SocketProvider>
+          <InitSocket />
+          {children}
+        </SocketProvider>
       </body>
     </html>
   );

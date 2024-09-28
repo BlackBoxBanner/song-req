@@ -3,7 +3,7 @@
 import { User } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { deleteSongs } from "@/components/action/admin";
-import { resyncSong } from "@/lib/song";
+import { sendData } from "@/lib/socket";
 
 export const DeleteForm = ({ name }: Pick<User, "name">) => {
   if (!name) return null;
@@ -11,7 +11,7 @@ export const DeleteForm = ({ name }: Pick<User, "name">) => {
     <Button
       onClick={async () => {
         await deleteSongs(name);
-        resyncSong(name);
+        sendData("send-song", []);
       }}
     >
       Delete all songs

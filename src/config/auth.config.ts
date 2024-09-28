@@ -4,7 +4,7 @@ import * as bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
 
 const getUser = async (username: string) => {
-  return prisma.user.findFirst({
+  return prisma.user.findUnique({
     where: {
       username,
     },
@@ -13,17 +13,9 @@ const getUser = async (username: string) => {
 
 export default {
   callbacks: {
-    authorized: async ({ auth }) => {
-      
+    authorized: async ({ auth, request }) => {
       // Logged in users are authenticated, otherwise redirect to login page
-      return !!auth
-    },
-    async redirect({ url, baseUrl }) {
-      // Allows relative callback URLs
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
-      // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url;
-      return baseUrl;
+      return !!auth;
     },
   },
   session: { strategy: "jwt" },
@@ -35,13 +27,15 @@ export default {
       },
       authorize: async ({ username, password }) => {
         const user = await getUser(String(username));
-        if (!user || !user.password) throw new Error("No user found");
+        if (!user) {
+          throw new Error("No user found with this username.");
+        }
 
-        const isValid = await bcrypt.compare(String(password), user.password);
+        const isValid = await bcrypt.compare(String(password), user.password!);
         if (isValid) return user;
 
-        console.log("Invalid credentials");
-        return null;
+        // Throw a more specific error for incorrect credentials
+        throw new Error("Invalid password.");
       },
     }),
   ],

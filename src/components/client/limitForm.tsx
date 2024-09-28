@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { setLimit as setLimitAction } from "@/components/action/admin";
 import { sendData, useReceiveData } from "@/lib/socket";
 import { Input } from "../ui/input";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -15,7 +15,6 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
-import { resyncSong } from "@/lib/song";
 
 export const LimitForm = ({
   name,
@@ -27,9 +26,9 @@ export const LimitForm = ({
 
   const onSubmit = async () => {
     if (!name) return;
-    setLimitAction({ name, limit });
+    const songs = await setLimitAction({ name, limit });
     sendData("send-limit", limit);
-    resyncSong(name);
+    sendData("send-song", songs?.Song);
     closeRef.current?.click();
   };
 

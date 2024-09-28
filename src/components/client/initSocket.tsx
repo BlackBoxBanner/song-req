@@ -3,77 +3,63 @@
 import { socket } from "@/lib/socket";
 import { useSocketInit } from "@/components/context/socketContext";
 import { toast } from "@/components/ui/use-toast";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
 import { delay } from "@/components/basic/delay";
 
 const InitSocket = () => {
   const { setSocketInit } = useSocketInit();
 
-  useEffect(() => {
+  const showToast = (
+    title: string,
+    description: string,
+    variant: "default" | "destructive" = "default"
+  ) => {
     const toastContent = toast({
+      title,
+      description,
+      variant,
       duration: 10000,
     });
 
-    const updateToast = (
-      title: string,
-      description: string,
-      variant: "default" | "destructive" = "default"
-    ) => {
-      toastContent.update({
-        ...toastContent,
-        title,
-        description,
-        variant,
-      });
-    };
+    // Auto-dismiss the toast after a delay
+    delay(1000).then(() => toastContent.dismiss());
+  };
 
-    const handleToastDismiss = () => {
-      delay(1000).then(() => toastContent.dismiss());
-    };
+  const handleConnect = useCallback(() => {
+    setSocketInit(true);
+    showToast("เชื่อมต่อสำเร็จ", "คุณเชื่อมต่อกับเซิร์ฟเวอร์แล้ว");
+  }, [setSocketInit]);
 
-    const onConnect = () => {
-      setSocketInit(true);
-      updateToast(
-        "เชื่อมต่อสำเร็จ",
-        "คุณเชื่อมต่อกับเซิร์ฟเวอร์แล้ว",
-        "default"
-      );
-      handleToastDismiss();
-    };
-
-    const onDisconnect = () => {
-      setSocketInit(false);
-      updateToast(
-        "การเชื่อมต่อขาดหาย",
-        "ระบบไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
-        "destructive"
-      );
-      handleToastDismiss();
-    };
-
-    updateToast(
-      "กำลังเชื่อมต่อ",
-      "ระบบกำลังเชื่อมต่อกับเซิร์ฟเวอร์ รอสักครู่",
-      "default"
+  const handleDisconnect = useCallback(() => {
+    setSocketInit(false);
+    showToast(
+      "การเชื่อมต่อขาดหาย",
+      "ระบบไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้",
+      "destructive"
     );
+  }, [setSocketInit]);
 
-    // If the socket is already connected, trigger onConnect
+  useEffect(() => {
+    // Show initial connecting message
+    showToast("กำลังเชื่อมต่อ", "ระบบกำลังเชื่อมต่อกับเซิร์ฟเวอร์ รอสักครู่");
+
+    // Trigger onConnect immediately if socket is already connected
     if (socket.connected) {
-      onConnect();
+      handleConnect();
     }
 
     // Set up socket event listeners
-    socket.on("connect", onConnect);
-    socket.on("disconnect", onDisconnect);
+    socket.on("connect", handleConnect);
+    socket.on("disconnect", handleDisconnect);
 
-    // Cleanup on component unmount
+    // Cleanup listeners on unmount
     return () => {
-      socket.off("connect", onConnect);
-      socket.off("disconnect", onDisconnect);
+      socket.off("connect", handleConnect);
+      socket.off("disconnect", handleDisconnect);
     };
-  }, [setSocketInit]); // Make sure setSocketInit is added as a dependency
+  }, [setSocketInit]); // `setSocketInit` is stable, no need for extra dependencies
 
-  return null; // This component doesn't render any visible content
+  return null; // No visual content
 };
 
 export default InitSocket;

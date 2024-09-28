@@ -22,7 +22,7 @@ const CreatorPage = async () => {
   return (
     <main
       className={cn(
-        "grid grid-cols-1 grid-rows-[auto,1fr] lg:grid-rows-1 lg:grid-cols-2 h-dvh bg-background"
+        "grid grid-cols-1 grid-rows-[auto,1fr] lg:grid-rows-1 lg:grid-cols-2 h-dvh bg-background",
       )}
     >
       <div className={cn("grid grid-cols-2 row-auto h-fit gap-2 p-2")}>
