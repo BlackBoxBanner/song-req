@@ -80,6 +80,7 @@ const AdminSongTable = ({ songs: initialSongs, name }: AdminSongTableProps) => {
               </TableCell>
               <TableCell className="flex justify-start items-center">
                 <Checkbox
+                  aria-labelledby={`song-check-${song.id}`}
                   className="flex justify-center items-center"
                   checked={song.done}
                   onCheckedChange={async (checked) => {

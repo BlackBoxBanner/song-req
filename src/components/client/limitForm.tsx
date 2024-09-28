@@ -69,6 +69,7 @@ export const LimitForm = ({ name, limit: limitDefault }: LimitFormProps) => {
       onSubmit={(e) => e.preventDefault()} // Prevent form's default behavior
     >
       <Input
+        aria-labelledby="limit-input"
         onChange={(e) => {
           const rawValue = e.target.value;
           if (rawValue === "") {
