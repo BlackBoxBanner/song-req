@@ -54,7 +54,7 @@ const SongRequestForm = ({
       // Perform the song request action
       const songList = await requestSongAction({
         name,
-        songName: song,
+        songName: song.trim(),
         songLimit,
       });
 
