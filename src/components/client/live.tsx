@@ -57,6 +57,7 @@ const ChangeLiveForm = (props: ChangeLiveFormProps) => {
 interface LiveStatusProps {
   live: User["live"];
   name: User["name"];
+  prefix?: string;
 }
 
 const LiveStatus = (props: LiveStatusProps) => {
@@ -83,7 +84,7 @@ const LiveStatus = (props: LiveStatusProps) => {
           : "bg-red-600 text-primary-foreground"
       )}
     >
-      {liveStatus ? "Live" : "Offline"}
+      {`${props.prefix} ${liveStatus ? "Live" : "Offline"}`}
     </p>
   );
 };
