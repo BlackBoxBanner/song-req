@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { requestSongAction } from "@/components/action/song";
-import { sendData, useReceiveData } from "@/lib/socket";
+import { createObject, joinRoom, sendData, useReceiveData } from "@/lib/socket";
 import { useToast } from "../ui/use-toast";
 import { useEffect } from "react";
 
@@ -45,7 +45,7 @@ const SongRequestForm = ({
         songName: song,
         songLimit,
       });
-      sendData("send-song", songList);
+      sendData("send-song", createObject(name, songList));
     } catch (error) {
       if (error instanceof Error) {
         console.log(error);
@@ -79,6 +79,10 @@ const SongRequestForm = ({
       });
     }
   }, [liveStatus]);
+
+  useEffect(() => {
+    joinRoom(name!);
+  }, [name]);
 
   return (
     <form className="flex gap-2 pt-2" onSubmit={handleSubmit(submitHandler)}>

@@ -20,24 +20,26 @@ const CreatorPage = async () => {
   if (!user) return null;
 
   return (
-    <main
-      className={cn(
-        "grid grid-cols-1 grid-rows-[auto,1fr] lg:grid-rows-1 lg:grid-cols-2 h-dvh bg-background",
-      )}
-    >
-      <div className={cn("grid grid-cols-2 row-auto h-fit gap-2 p-2")}>
-        <div className="col-span-2 grid grid-cols-2">
-          <LiveStatus live={user.live} />
+    <>
+      <main
+        className={cn(
+          "grid grid-cols-1 grid-rows-[auto,1fr] lg:grid-rows-1 lg:grid-cols-2 h-dvh bg-background"
+        )}
+      >
+        <div className={cn("grid grid-cols-2 row-auto h-fit gap-2 p-2")}>
+          <div className="col-span-2 grid grid-cols-2">
+            <LiveStatus live={user.live} />
+          </div>
+          <SignOutButton />
+          <ChangeLiveForm name={user.name} live={user.live} />
+          <DeleteForm name={user.name} />
+          <LimitForm name={user.name} limit={user.limit} />
         </div>
-        <SignOutButton />
-        <ChangeLiveForm name={user.name} live={user.live} />
-        <DeleteForm name={user.name} />
-        <LimitForm name={user.name} limit={user.limit} />
-      </div>
-      <div className="overflow-auto lg:h-dvh p-2 relative">
-        <AdminSongTable songs={user.Song} />
-      </div>
-    </main>
+        <div className="overflow-auto lg:h-dvh p-2 relative">
+          <AdminSongTable songs={user.Song} name={user.name!} />
+        </div>
+      </main>
+    </>
   );
 };
 

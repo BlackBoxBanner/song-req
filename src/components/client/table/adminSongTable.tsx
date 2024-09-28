@@ -9,23 +9,29 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { sendData, useReceiveData } from "@/lib/socket";
+import { createObject, joinRoom, sendData, useReceiveData } from "@/lib/socket";
 import { Song } from "@prisma/client";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { editSong } from "@/components/action/admin";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 type AdminSongTableProps = {
   songs: Song[];
+  name: string;
 };
-const AdminSongTable = ({ songs: initialSong }: AdminSongTableProps) => {
+const AdminSongTable = ({ songs: initialSong, name }: AdminSongTableProps) => {
   const songs = useReceiveData<Song[]>("receive-song", initialSong);
 
   const handleCheckChange = async (song: Song, checked: boolean) => {
     const newSongList = await editSong({ id: song.id, done: checked });
-    sendData("send-song", newSongList);
+    sendData("send-song", createObject(name, newSongList));
   };
+
+  useEffect(() => {
+    joinRoom(name!);
+  }, [name]);
 
   return (
     <>

@@ -3,9 +3,9 @@
 import { User } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { setLimit as setLimitAction } from "@/components/action/admin";
-import { sendData, useReceiveData } from "@/lib/socket";
+import { createObject, joinRoom, sendData, useReceiveData } from "@/lib/socket";
 import { Input } from "../ui/input";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -27,10 +27,14 @@ export const LimitForm = ({
   const onSubmit = async () => {
     if (!name) return;
     const songs = await setLimitAction({ name, limit });
-    sendData("send-limit", limit);
-    sendData("send-song", songs?.Song);
+    sendData("send-limit", createObject(name, limit));
+    sendData("send-song", createObject(name, songs?.Song));
     closeRef.current?.click();
   };
+
+  useEffect(() => {
+    joinRoom(name!);
+  }, [name]);
 
   return (
     <form
