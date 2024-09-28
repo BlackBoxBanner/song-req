@@ -37,7 +37,7 @@ export const LimitForm = ({ name, limit: limitDefault }: LimitFormProps) => {
     if (songLimit !== limit) {
       setLimit(songLimit);
     }
-  }, [songLimit]);
+  }, [songLimit, limit]);
 
   const onSubmit = async () => {
     if (!name) return;

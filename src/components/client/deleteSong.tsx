@@ -11,10 +11,18 @@ interface DeleteFormProps {
 }
 
 export const DeleteForm = ({ name }: DeleteFormProps) => {
-  // Return early if no name is provided
-  if (!name) return null;
+  const handleDelete = async () => {
+    try {
+      await deleteSongs(name!); // Delete songs related to the user
+      sendData("send-song", createObject(name!, [])); // Send an empty list (or the appropriate data structure)
+    } catch (error) {
+      console.error("Error deleting songs or sending data:", error);
+    }
+  };
 
   useEffect(() => {
+    if (!name) return; // Early return if no name is provided
+
     // Join room when component mounts
     joinRoom(name);
 
@@ -24,14 +32,8 @@ export const DeleteForm = ({ name }: DeleteFormProps) => {
     };
   }, [name]);
 
-  const handleDelete = async () => {
-    try {
-      await deleteSongs(name); // Delete songs related to the user
-      sendData("send-song", createObject(name, [])); // Send an empty list (or the appropriate data structure)
-    } catch (error) {
-      console.error("Error deleting songs or sending data:", error);
-    }
-  };
+  // Return early if no name is provided
+  if (!name) return null;
 
   return <Button onClick={handleDelete}>Delete all songs</Button>;
 };
