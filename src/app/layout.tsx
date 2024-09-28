@@ -13,8 +13,8 @@ export const metadata: Metadata = {
   title: "ขอเพลง",
   description: "แอปพลิเคชันสำหรับขอเพลงขณะไลฟ์สด",
   keywords: ["ขอเพลง", "ไลฟ์สด", "เพลง", "แอปพลิเคชัน"],
-  authors: [{ name: "BlackBoxBanner" }],
-  creator: "BlackBoxBanner",
+  authors: [{ name: "Sueksit Vachirakumthorn" }],
+  creator: "Sueksit Vachirakumthorn",
   applicationName: "ขอเพลง",
 };
 
