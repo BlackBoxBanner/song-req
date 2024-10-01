@@ -22,6 +22,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { editSong } from "@/components/action/admin";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
+import Link from "next/link";
 
 type AdminSongTableProps = {
   songs: Song[];
@@ -73,7 +74,14 @@ const AdminSongTable = ({ songs: initialSongs, name }: AdminSongTableProps) => {
               className={cn(song.done && "bg-neutral-100")}
             >
               <TableCell className="font-medium">{index + 1}</TableCell>
-              <TableCell>{song.title}</TableCell>
+              <TableCell>
+                <Link
+                  href={`https://www.dochord.com/search/?q=${song.title}`}
+                  target="_blank"
+                >
+                  {song.title}
+                </Link>
+              </TableCell>
               <TableCell className="text-right">
                 {format(new Date(song.createAt), "HH:mm:ss:SS")}{" "}
                 {/* Ensure date is formatted properly */}
