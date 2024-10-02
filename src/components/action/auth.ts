@@ -60,13 +60,37 @@ export const registerAction = async ({
       throw new Error("User already exists");
     }
 
-    await prisma.user.create({
+    const newUser = await prisma.user.create({
       data: {
         name: username,
         username,
         password: await bcrypt.hash(password, 10),
+        LiveSession: {
+          create: {
+            name: "default",
+            route: username,
+            default: true,
+          },
+        },
+      },
+      select: {
+        id: true,
+        LiveSession: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
+
+    await prisma.liveParticipant.create({
+      data: {
+        userId: newUser.id,
+        liveSessionId: newUser.LiveSession[0].id,
+      },
+    });
+
+    // await prisma.
     return { success: true };
   } catch (error: unknown) {
     if (error instanceof Error) {
