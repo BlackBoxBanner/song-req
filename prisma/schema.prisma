@@ -37,25 +37,6 @@ model Session {
   @@map("sessions")
 }
 
-model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  username      String?   @unique
-  password      String?
-  emailVerified DateTime? @map("email_verified")
-  image         String?
-  limit         Int      @default(10)
-  live          Boolean   @default(false)
-  accounts      Account[]
-  sessions      Session[]
-
-  Domain Domain?
-  Song   Song[]
-
-  @@map("users")
-}
-
 model VerificationToken {
   identifier String
   token      String
@@ -65,22 +46,57 @@ model VerificationToken {
   @@map("verificationtokens")
 }
 
-model Domain {
-  id       String   @unique @default(uuid())
-  url      String
-  userId   String   @unique
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  username      String?   @unique
+  password      String?
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  LiveSession     LiveSession[]
+  LiveParticipant LiveParticipant[]
+
+  @@map("users")
+}
+
+model LiveSession {
+  id           String  @id @default(cuid())
+  name         String
+  limit        Int     @default(10)
+  live         Boolean @default(false)
+  allowRequest Boolean @default(false)
+  createBy     String
+  default      Boolean @default(false)
+  route        String  @unique
+
   createAt DateTime @default(now())
 
-  User User @relation(fields: [userId], references: [id])
+  User User @relation(fields: [createBy], references: [id], onDelete: Cascade)
+
+  LiveParticipant LiveParticipant[]
+  Song            Song[]
+}
+
+model LiveParticipant {
+  id            String   @id @default(cuid())
+  liveSessionId String
+  userId        String
+  createAt      DateTime @default(now())
+
+  LiveSession LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
+  User        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Song {
-  id       String   @unique @default(uuid())
-  title    String
-  done     Boolean  @default(false)
-  delete   Boolean  @default(false)
-  createAt DateTime @default(now())
+  id            String   @unique @default(uuid())
+  title         String
+  done          Boolean  @default(false)
+  createAt      DateTime @default(now())
+  liveSessionId String
 
-  userId String
-  User   User   @relation(fields: [userId], references: [id])
+  LiveSession LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
 }
