@@ -4,24 +4,19 @@ import { Prisma, PrismaClient, User } from "@prisma/client";
 
 export const getLiveSessionFromUsersName = async (name: string) => {
   return await prisma.liveParticipant.findMany({
-    where: {
-      User: {
-        name,
-      },
-    },
-    select: {
+    // where: {
+    //   User: {
+    //     name,
+    //   },
+    // },
+    include: {
       LiveSession: {
-        select: {
-          id: true,
-          live: true,
-          name: true,
-          limit: true,
-          allowRequest: true,
-          createAt: true,
-          createBy: true,
-          default: true,
-          route: true,
-          LiveParticipant: true,
+        include: {
+          LiveParticipant: {
+            include: {
+              User: true,
+            },
+          },
         },
       },
     },

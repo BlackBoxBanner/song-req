@@ -64,31 +64,42 @@ model User {
 }
 
 model LiveSession {
-  id           String  @id @default(cuid())
+  id           String   @id @default(cuid())
   name         String
-  limit        Int     @default(10)
-  live         Boolean @default(false)
-  allowRequest Boolean @default(false)
+  limit        Int      @default(10)
+  live         Boolean  @default(false)
+  allowRequest Boolean  @default(false)
   createBy     String
-  default      Boolean @default(false)
-  route        String  @unique
+  default      Boolean  @default(false)
+  route        String   @unique
+  createAt     DateTime @default(now())
 
-  createAt DateTime @default(now())
-
-  User User @relation(fields: [createBy], references: [id], onDelete: Cascade)
-
-  LiveParticipant LiveParticipant[]
-  Song            Song[]
+  User         User                        @relation(fields: [createBy], references: [id], onDelete: Cascade)
+  participants LiveParticipantOnSessions[]
+  Song         Song[]
 }
 
 model LiveParticipant {
-  id            String   @id @default(cuid())
-  liveSessionId String
-  userId        String
-  createAt      DateTime @default(now())
+  id       String   @id @default(cuid())
+  userId   String
+  createAt DateTime @default(now())
 
-  LiveSession LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
-  User        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  User     User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessions LiveParticipantOnSessions[]
+}
+
+// Join table for many-to-many relationship
+model LiveParticipantOnSessions {
+  liveSession   LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
+  liveSessionId String
+
+  liveParticipant   LiveParticipant @relation(fields: [liveParticipantId], references: [id], onDelete: Cascade)
+  liveParticipantId String
+
+  assignedAt DateTime @default(now())
+  assignedBy String
+
+  @@id([liveSessionId, liveParticipantId])
 }
 
 model Song {

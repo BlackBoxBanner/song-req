@@ -16,6 +16,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { format } from "date-fns";
 
 const CreatorPage = async () => {
   // Fetch the session from the server
@@ -38,27 +39,65 @@ const CreatorPage = async () => {
 
   return (
     <>
-      <main className={cn("h-dvh bg-background flex flex-col gap-4 p-4")}>
-        {liveSession.map(({ LiveSession: liveSession }, index) => {
+      <main
+        className={cn(
+          "h-dvh bg-background grid grid-cols-1 lg:grid-cols-2 gap-4 p-4"
+        )}
+      >
+        <pre>{JSON.stringify(liveSession, null, 2)}</pre>
+        {liveSession.map(({ LiveSession: liveSession }) => {
           return (
-            <Card key={liveSession.id} className="relative">
+            <Card key={liveSession.id} className="relative h-min">
               <CardHeader>
-                <CardTitle>{liveSession.name}</CardTitle>
-                {/* <CardDescription>Card Description</CardDescription> */}
+                <CardTitle className="capitalize truncate">
+                  {liveSession.name}
+                </CardTitle>
+                <CardDescription>
+                  {/* Display the session creation date */}
+                  Created at: {format(new Date(liveSession.createAt), "PPpp")}
+                </CardDescription>
               </CardHeader>
+
               <CardContent>
+                {/* Indicate if the session is live with a status icon */}
                 {liveSession.live && (
                   <div className="absolute top-4 right-4 flex flex-col">
                     <div className="relative flex justify-center items-center">
                       <div className="absolute w-2 h-2 bg-lime-400 rounded-full" />
                       <div className="absolute w-4 h-4 bg-lime-400 opacity-60 rounded-full animate-ping" />
                     </div>
+                    <p className="text-lime-500 text-sm">Live</p>
                   </div>
                 )}
-                <pre>{JSON.stringify(liveSession, null, 2)}</pre>
+
+                {/* Display live session details */}
+                <p>
+                  <strong>Limit:</strong> {liveSession.limit} songs
+                </p>
+                <p>
+                  <strong>Allow Requests:</strong>{" "}
+                  {liveSession.allowRequest ? "Yes" : "No"}
+                </p>
+                <p>
+                  <strong>Route:</strong> {liveSession.route}
+                </p>
               </CardContent>
+
               <CardFooter>
-                <p>Card Footer</p>
+                {liveSession.LiveParticipant.length > 0 && (
+                  <div className="mt-4">
+                    <h4 className="font-semibold">Participants:</h4>
+                    <ul className="list-disc pl-5">
+                      {liveSession.LiveParticipant.map((participant) => (
+                        <li key={participant.id}>
+                          {participant.User.name}{" "}
+                          {participant.userId === liveSession.createBy &&
+                            "(Host)"}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </CardFooter>
             </Card>
           );
