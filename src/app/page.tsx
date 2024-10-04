@@ -19,10 +19,7 @@ export default function Home() {
       <section className="h-dvh bg-background flex justify-center items-center flex-col p-16 gap-4">
         <h1 className="text-[clamp(26px,4vw,35px)]">Song Request Platform</h1>
         <p className="text-[clamp(16px,4vw,22px)] w-[35rem] text-center">
-          Welcome to the Song Request Platform where creators can host live
-          sessions, and users can request their favorite songs to be played live
-          during those sessions. Simply enter the creator's name to join their
-          live page and make your song requests!
+          {`Welcome to the Song Request Platform where creators can host live sessions, and users can request their favorite songs to be played live during those sessions. Simply enter the creator's name to join their live page and make your song requests!`}
         </p>
 
         {/* Form to enter creator name and route to /live/<username> */}

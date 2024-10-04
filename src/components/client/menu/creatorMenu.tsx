@@ -172,7 +172,7 @@ const CreateSessionDialog = forwardRef<
                     <Input placeholder="Session route" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Define the session's route (e.g., xyz).
+                    {`Define the session's route (e.g., xyz).`}
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
@@ -186,3 +186,5 @@ const CreateSessionDialog = forwardRef<
     </Dialog>
   );
 });
+
+CreateSessionDialog.displayName = "CreateSessionDialog";

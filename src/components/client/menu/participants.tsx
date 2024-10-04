@@ -14,7 +14,7 @@ const LiveParticipantsList = ({
   liveParticipant,
 }: LiveParticipantsListProps) => {
   return liveParticipant.map((user) => (
-    <TooltipProvider>
+    <TooltipProvider key={user.id}>
       <Tooltip>
         <TooltipTrigger asChild>
           <Avatar key={user.id}>

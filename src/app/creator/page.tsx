@@ -44,7 +44,7 @@ const CreatorPage = async () => {
           {liveSession.map(({ sessions }) => {
             return sessions.map(({ liveSession }) => {
               return (
-                <Link href={`/creator/${liveSession.id}`}>
+                <Link href={`/creator/${liveSession.id}`} key={liveSession.id}>
                   <Card key={liveSession.id} className="relative h-full">
                     <CardHeader>
                       <CardTitle className="capitalize truncate">
