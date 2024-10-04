@@ -123,6 +123,7 @@ export const createLiveSession = async ({
   route,
   limit,
   createBy,
+  default: defaultSession = false,
 }: CreateLiveSessionProps) => {
   const newLiveSession = await prisma.liveSession.create({
     data: {
@@ -130,6 +131,7 @@ export const createLiveSession = async ({
       route,
       limit: isNaN(parseInt(limit)) ? 10 : parseInt(limit),
       createBy,
+      default: defaultSession,
     },
   });
 
@@ -267,6 +269,24 @@ export const removeParticipant = async (userId: string, liveId: string) => {
           liveSessionId: liveId,
         },
       },
+    },
+  });
+  return revalidatePath("/creator/*");
+};
+
+export const deleteSession = async (id: string) => {
+  await prisma.liveParticipant.deleteMany({
+    where: {
+      sessions: {
+        some: {
+          liveSessionId: id,
+        },
+      },
+    },
+  });
+  await prisma.liveSession.delete({
+    where: {
+      id,
     },
   });
   return revalidatePath("/creator/*");

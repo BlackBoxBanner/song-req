@@ -4,6 +4,7 @@ import AdminSongTable from "@/components/client/table/adminSongTable";
 import LiveSessionMenu from "@/components/client/menu/liveSessionMenu";
 import StatusBadgeBar from "@/components/client/statusBadgeBar";
 import { useSession } from "@/lib/session";
+import { cn } from "@/lib/utils";
 
 const CreatorLivePage = async ({
   params: { id },
@@ -38,13 +39,19 @@ const CreatorLivePage = async ({
   return (
     <>
       <main className="h-dvh bg-background p-4 flex flex-col gap-4">
-        <div className="grid grid-cols-[auto,1fr,auto] items-center gap-4">
+        <div
+          className={cn(
+              "grid items-center grid-cols-[1fr,auto]"
+          )}
+        >
           <LiveSessionMenu
             live={liveSession.live}
             id={liveSession.id}
             limit={liveSession.limit}
             allowRequest={liveSession.allowRequest}
             createBy={liveSession.createBy}
+            userId={user.id}
+            defaultSession={liveSession.default}
             liveParticipant={liveSession.participants.map(
               (p) => p.liveParticipant.User
             )}
@@ -55,6 +62,7 @@ const CreatorLivePage = async ({
           allowRequest={liveSession.allowRequest}
           live={liveSession.live}
           limit={liveSession.limit}
+          route={liveSession.route}
         />
         {/* Admin Song Table */}
         <div className="overflow-auto lg:h-dvh relative">

@@ -19,6 +19,7 @@ import { LiveParticipant, LiveSession, User } from "@prisma/client";
 import {
   changeAllowRequest,
   changeLive,
+  deleteSession,
   deleteSongs,
 } from "@/components/action/admin";
 import {
@@ -34,6 +35,8 @@ import { LimitForm } from "@/components/client/limitForm";
 import { signOutAction } from "@/components/action/auth";
 import LiveParticipantsList from "@/components/client/menu/participants";
 import AddParticipantsForm from "@/components/client/menu/addParticipantsForm";
+import { cn } from "@/lib/utils";
+import { redirect, useRouter } from "next/navigation";
 
 interface CreatorMenuProps {
   id: LiveSession["id"];
@@ -42,6 +45,8 @@ interface CreatorMenuProps {
   allowRequest: LiveSession["allowRequest"];
   liveParticipant: User[];
   createBy: LiveSession["createBy"];
+  userId: User["id"];
+  defaultSession: LiveSession["default"];
 }
 
 const LiveSessionMenu = ({
@@ -50,13 +55,18 @@ const LiveSessionMenu = ({
   limit,
   allowRequest,
   liveParticipant,
-  createBy
+  createBy,
+  userId,
+  defaultSession
 }: CreatorMenuProps) => {
   const songLimit = useReceiveData("receive-limit", limit);
   const liveStatus = useReceiveData("receive-session", live);
   const isAllowRequest = useReceiveData("receive-allowRequest", allowRequest);
 
   const limitFormRef = useRef<HTMLButtonElement>(null);
+
+  const route = useRouter();
+
   const handleDeleteAll = async () => {
     try {
       await deleteSongs(id); // Delete songs related to the user
@@ -99,6 +109,15 @@ const LiveSessionMenu = ({
     }
   };
 
+  const onDeleteSession = async () => {
+    try {
+      await deleteSession(id);
+      route.push("/creator");
+    } catch (error) {
+      console.error("Error changing live status:", error);
+    }
+  };
+
   useEffect(() => {
     if (id) {
       joinRoom(id); // Join room when component mounts
@@ -113,9 +132,7 @@ const LiveSessionMenu = ({
 
   return (
     <>
-      <div>
-        <LimitForm id={id} limit={limit} ref={limitFormRef} />
-      </div>
+      <LimitForm id={id} limit={limit} ref={limitFormRef} />
       <Menubar>
         <MenubarMenu>
           <MenubarTrigger>Session</MenubarTrigger>
@@ -124,6 +141,11 @@ const LiveSessionMenu = ({
             <MenubarItem onClick={onChangeAllowSongRequest}>
               Change allow song request
             </MenubarItem>
+            {userId === createBy && !defaultSession && (
+              <MenubarItem onClick={onDeleteSession}>
+                Delete session
+              </MenubarItem>
+            )}
           </MenubarContent>
         </MenubarMenu>
         <MenubarMenu>
@@ -166,9 +188,17 @@ const LiveSessionMenu = ({
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
-      <div className="min-w-40 flex gap-2 justify-between">
-        {/* <LiveParticipantsList liveParticipant={liveParticipant} /> */}
-        <AddParticipantsForm id={id} liveParticipant={liveParticipant} createBy={createBy} />
+      <div
+        className={cn(
+          "min-w-40 ml-4",
+          userId === createBy && defaultSession && "hidden"
+        )}
+      >
+        <AddParticipantsForm
+          id={id}
+          liveParticipant={liveParticipant}
+          createBy={createBy}
+        />
       </div>
     </>
   );

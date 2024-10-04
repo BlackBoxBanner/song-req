@@ -1,4 +1,5 @@
 "use client";
+
 import { Badge } from "@/components/ui/badge";
 import { joinRoom, leaveRoom, useReceiveData } from "@/lib/socket";
 import { LiveSession } from "@prisma/client";
@@ -9,6 +10,7 @@ type StatusBadgeBarProps = {
   allowRequest: LiveSession["allowRequest"];
   live: LiveSession["live"];
   limit: LiveSession["limit"];
+  route: LiveSession["route"];
 };
 
 const StatusBadgeBar = ({
@@ -16,6 +18,7 @@ const StatusBadgeBar = ({
   limit,
   live,
   allowRequest,
+  route,
 }: StatusBadgeBarProps) => {
   const isLive = useReceiveData("receive-session", live);
   const songLimit = useReceiveData("receive-limit", limit);
@@ -36,6 +39,7 @@ const StatusBadgeBar = ({
       <Badge>Session: {isLive ? "Live" : "Offline"}</Badge>
       <Badge>Allow song request: {isAllowRequest ? "Yes" : "No"}</Badge>
       <Badge>Song request limit: {songLimit}</Badge>
+      <Badge>Url: {`${process.env.NEXT_PUBLIC_BASE_URL}/live/${route}`}</Badge>
     </div>
   );
 };
