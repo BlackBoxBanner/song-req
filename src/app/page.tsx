@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
+import { signOut } from "@/lib/auth";
 
 export default function Home() {
   const toLiveAction = async (formData: FormData) => {
@@ -17,7 +18,7 @@ export default function Home() {
 
   const clearSession = async (formData: FormData) => {
     "use server";
-
+    await signOut();
     const cookieStore = cookies();
     cookieStore.getAll().forEach((cookie) => {
       cookieStore.delete(cookie.name);
