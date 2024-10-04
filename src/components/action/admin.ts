@@ -7,10 +7,10 @@ export const getLiveSessionFromUsersName = async (name: string) => {
   return await prisma.liveParticipant.findMany({
     where: {
       sessions: {
-        every: {
-          liveSession: {
+        some: {
+          liveParticipant: {
             User: {
-              name,
+              username: name,
             },
           },
         },
@@ -234,108 +234,40 @@ export const editSong = async (song: { id: string; done: boolean }) => {
   return allSongs;
 };
 
-// export const getSongs = async (name: string) => {
-//   return prisma.song.findMany({
-//     where: {
-//       User: {
-//         username: name,
-//       },
-//     },
-//     orderBy: {
-//       createAt: "asc",
-//     },
-//   });
-// };
+export const getAllUsers = async () => {
+  return await prisma.user.findMany({
+    select: {
+      id: true,
+      username: true,
+    },
+  });
+};
 
-// export const deleteSongs = async (name: string) => {
-//   await prisma.song.deleteMany({
-//     where: {
-//       User: {
-//         username: name,
-//       },
-//     },
-//   });
-// };
+export const addParticipant = async (userId: string, liveId: string) => {
+  await prisma.liveParticipant.create({
+    data: {
+      userId,
+      sessions: {
+        create: {
+          liveSessionId: liveId,
+          assignedBy: userId,
+        },
+      },
+    },
+  });
+  return revalidatePath("/creator/*");
+};
 
-// export const getUser = async (name: string, withSong: boolean = false) => {
-//   return await prisma.user.findUnique({
-//     where: {
-//       username: name,
-//     },
-//     select: {
-//       name: true,
-//       limit: true,
-//       live: true,
-//       Song: {
-//         orderBy: {
-//           createAt: "asc",
-//         },
-//       },
-//     },
-//   });
-// };
-
-// export const changeLive = async ({
-//   name,
-//   live = false,
-// }: Pick<User, "name" | "live">) => {
-//   if (!name) return;
-//   return await prisma.user.update({
-//     where: { username: name },
-//     data: {
-//       live: !live,
-//       Song: {
-//         deleteMany: [],
-//       },
-//     },
-//     select: { live: true },
-//   });
-// };
-
-// export const setLimit = async ({
-//   name,
-//   limit,
-// }: Pick<User, "name" | "limit">) => {
-//   if (!name) return;
-//   return await prisma.user.update({
-//     where: {
-//       username: name,
-//     },
-//     data: {
-//       limit: Math.abs(limit),
-//       Song: {
-//         deleteMany: {},
-//       },
-//     },
-//     select: {
-//       limit: true,
-//       Song: {
-//         orderBy: {
-//           createAt: "asc",
-//         },
-//       },
-//     },
-//   });
-// };
-
-// export const editSong = async (song: { id: string; done: boolean }) => {
-//   const changedSong = await prisma.song.update({
-//     where: {
-//       id: song.id,
-//     },
-//     data: {
-//       done: song.done,
-//     },
-//   });
-//   const allSongs = await prisma.song.findMany({
-//     where: {
-//       userId: changedSong.userId,
-//     },
-//     orderBy: {
-//       createAt: "asc",
-//     },
-//   });
-
-//   prisma.$disconnect();
-//   return allSongs;
-// };
+export const removeParticipant = async (userId: string, liveId: string) => {
+  await prisma.liveParticipant.deleteMany({
+    where: {
+      userId,
+      sessions: {
+        some: {
+          liveSessionId: liveId,
+        },
+      },
+    },
+  });
+  return revalidatePath("/creator/*");
+};

@@ -15,7 +15,7 @@ import {
   MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { LiveSession, User } from "@prisma/client";
+import { LiveParticipant, LiveSession, User } from "@prisma/client";
 import {
   changeAllowRequest,
   changeLive,
@@ -32,12 +32,16 @@ import { useEffect, useRef } from "react";
 import { setLimit as setLimitAction } from "@/components/action/admin";
 import { LimitForm } from "@/components/client/limitForm";
 import { signOutAction } from "@/components/action/auth";
+import LiveParticipantsList from "@/components/client/menu/participants";
+import AddParticipantsForm from "@/components/client/menu/addParticipantsForm";
 
 interface CreatorMenuProps {
   id: LiveSession["id"];
   live: LiveSession["live"];
   limit: LiveSession["limit"];
   allowRequest: LiveSession["allowRequest"];
+  liveParticipant: User[];
+  createBy: LiveSession["createBy"];
 }
 
 const LiveSessionMenu = ({
@@ -45,6 +49,8 @@ const LiveSessionMenu = ({
   id,
   limit,
   allowRequest,
+  liveParticipant,
+  createBy
 }: CreatorMenuProps) => {
   const songLimit = useReceiveData("receive-limit", limit);
   const liveStatus = useReceiveData("receive-session", live);
@@ -107,7 +113,9 @@ const LiveSessionMenu = ({
 
   return (
     <>
-      <LimitForm id={id} limit={limit} ref={limitFormRef} />
+      <div>
+        <LimitForm id={id} limit={limit} ref={limitFormRef} />
+      </div>
       <Menubar>
         <MenubarMenu>
           <MenubarTrigger>Session</MenubarTrigger>
@@ -158,6 +166,10 @@ const LiveSessionMenu = ({
           </MenubarContent>
         </MenubarMenu>
       </Menubar>
+      <div className="min-w-40 flex gap-2 justify-between">
+        {/* <LiveParticipantsList liveParticipant={liveParticipant} /> */}
+        <AddParticipantsForm id={id} liveParticipant={liveParticipant} createBy={createBy} />
+      </div>
     </>
   );
 };

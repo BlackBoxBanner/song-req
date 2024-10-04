@@ -9,7 +9,7 @@ type CreateDefaultSessionFormProps = {
 
 const CreateDefaultSessionForm = ({ user }: CreateDefaultSessionFormProps) => {
   return (
-    <div className="flex flex-col items-center justify-center h-96 gap-4">
+    <div className="flex flex-col items-center justify-center col-span-2 h-96 gap-4">
       <h1 className="text-3xl font-semibold">No live sessions found</h1>
       <Button
         onClick={() =>
