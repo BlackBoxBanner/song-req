@@ -1,5 +1,5 @@
 import {
-  getUserById,
+  createLiveSession,
   getLiveSessionFromUsersName,
   getUserByName,
 } from "@/components/action/admin";
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/card";
 import { format } from "date-fns";
 import OuterCreatorMenu from "@/components/client/menu/creatorMenu";
+import CreateDefaultSessionForm from "@/components/client/createDefaultSession";
 
 const CreatorPage = async () => {
   // Fetch the session from the server
@@ -39,8 +40,9 @@ const CreatorPage = async () => {
       <main className={cn("h-dvh bg-background p-4 flex flex-col gap-4")}>
         <OuterCreatorMenu userId={user.id} />
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 pb-4">
-          {liveSession.map(({ sessions }) =>
-            sessions.map(({ liveSession }) => {
+          {liveSession.length === 0 && <CreateDefaultSessionForm user={user} />}
+          {liveSession.map(({ sessions }) => {
+            return sessions.map(({ liveSession }) => {
               return (
                 <Link href={`/creator/${liveSession.id}`}>
                   <Card key={liveSession.id} className="relative h-min">
@@ -101,8 +103,8 @@ const CreatorPage = async () => {
                   </Card>
                 </Link>
               );
-            })
-          )}
+            });
+          })}
         </div>
       </main>
     </>

@@ -115,6 +115,7 @@ type CreateLiveSessionProps = {
   limit: string;
   route: string;
   createBy: string;
+  default?: boolean;
 };
 
 export const createLiveSession = async ({
