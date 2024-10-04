@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Input } from "@/components/ui/input";
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
 export default function Home() {
   const toLiveAction = async (formData: FormData) => {
@@ -12,6 +13,15 @@ export default function Home() {
       // Redirect to /live/<username> if the username is valid
       redirect(`/live/${username}`);
     }
+  };
+
+  const clearSession = async (formData: FormData) => {
+    "use server";
+
+    const cookieStore = cookies();
+    cookieStore.getAll().forEach((cookie) => {
+      cookieStore.delete(cookie.name);
+    });
   };
 
   return (
@@ -35,6 +45,15 @@ export default function Home() {
           />
           <Button type="submit" className="w-full">
             Go to Live Page
+          </Button>
+        </form>
+
+        <form
+          action={clearSession} // Server action to handle the form submission
+          className="flex flex-col items-center gap-4 w-full max-w-md"
+        >
+          <Button type="submit" className="w-full">
+            Clear session
           </Button>
         </form>
       </section>
