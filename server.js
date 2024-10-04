@@ -40,6 +40,16 @@ app.prepare().then(() => {
       io.to(room).emit("receive-session", data); // Send session data to the room
     });
 
+    // Event for sending allowing song request
+    socket.on("send-allowRequest", ({ room, data }) => {
+      io.to(room).emit("receive-allowRequest", data); // Send session data to the room
+    });
+
+    // Event for sending live participants
+    socket.on("send-participants", ({ room, data }) => {
+      io.to(room).emit("receive-participants", data); // Send session data to the room
+    });
+
     // Event for sending limit data to a room
     socket.on("send-limit", ({ room, data }) => {
       io.to(room).emit("receive-limit", data); // Send limit data to the room

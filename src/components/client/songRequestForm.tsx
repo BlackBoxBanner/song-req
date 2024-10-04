@@ -15,20 +15,24 @@ import {
 } from "@/lib/socket"; // Added leaveRoom for cleanup
 import { useToast } from "../ui/use-toast";
 import { useEffect } from "react";
+import { LiveSession } from "@prisma/client";
 
 type SongRequestFormProps = {
-  live: boolean;
-  name: string;
-  limit: number;
+  live: LiveSession["live"];
+  id: LiveSession["id"];
+  limit: LiveSession["limit"];
+  allowRequest: LiveSession["allowRequest"];
 };
 
 const SongRequestForm = ({
   live = false,
-  name,
+  id,
   limit,
+  allowRequest,
 }: SongRequestFormProps) => {
-  const liveStatus = useReceiveData("receive-session", live);
+  const isLive = useReceiveData("receive-session", live);
   const songLimit = useReceiveData("receive-limit", limit);
+  const isAllowRequest = useReceiveData("receive-allowRequest", allowRequest);
 
   // Zod schema for form validation
   const songSchema = z.object({
@@ -53,13 +57,13 @@ const SongRequestForm = ({
     try {
       // Perform the song request action
       const songList = await requestSongAction({
-        name,
-        songName: song.trim(),
+        id,
+        title: song.trim(),
         songLimit,
       });
 
       // Send updated song list through socket
-      sendData("send-song", createObject(name, songList));
+      sendData("send-song", createObject(id, songList));
 
       // Reset the form on successful submission
       reset();
@@ -82,43 +86,25 @@ const SongRequestForm = ({
     }
   };
 
-  // Effect to handle live session status
-  useEffect(() => {
-    if (!liveStatus) {
-      toast({
-        title: "Error",
-        description: "Live session is not available",
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Success",
-        description: "Live session is available",
-      });
-    }
-  }, [liveStatus, toast]);
-
   // Join socket room on component mount and leave on unmount
   useEffect(() => {
-    if (name) {
-      joinRoom(name); // Join the room for the session
+    if (id) {
+      joinRoom(id); // Join the room for the session
 
       return () => {
-        leaveRoom(name); // Leave room when component unmounts
+        leaveRoom(id); // Leave room when component unmounts
       };
     }
-  }, [name]);
+  }, [id]);
 
   return (
     <form className="flex gap-2 pt-2" onSubmit={handleSubmit(submitHandler)}>
       <Input
-        placeholder={
-          !liveStatus ? "Live session is not available" : "Song name"
-        }
+        placeholder={!isLive ? "Live session is not available" : !isAllowRequest ? "Song request is not allowed at the moment" : "Song name"}
         {...register("song")}
-        disabled={!liveStatus} // Disable input if live session is not available
+        disabled={!isLive || !isAllowRequest} // Disable input if live session is not available or song request is not allowed
       />
-      <Button type="submit" disabled={!liveStatus}>
+      <Button type="submit" disabled={!isLive}>
         Request
       </Button>
     </form>

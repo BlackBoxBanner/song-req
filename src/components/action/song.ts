@@ -1,21 +1,22 @@
 "use server";
 
 import prisma from "@/lib/prisma";
+import { LiveSession, Song } from "@prisma/client";
 import { cookies } from "next/headers";
 
 export const requestSongAction = async ({
-  name,
-  songName,
+  id,
+  title,
   songLimit = 10,
 }: {
-  name: string;
-  songName: string;
-  songLimit: number;
+  id: LiveSession["id"];
+  title: Song["title"];
+  songLimit: LiveSession["limit"];
 }) => {
   const songList = await prisma.song.findMany({
     where: {
-      User: {
-        username: name,
+      LiveSession: {
+        id,
       },
     },
     orderBy: {
@@ -29,10 +30,10 @@ export const requestSongAction = async ({
 
   const song = await prisma.song.create({
     data: {
-      title: songName,
-      User: {
+      title,
+      LiveSession: {
         connect: {
-          username: name,
+          id,
         },
       },
     },
@@ -40,10 +41,7 @@ export const requestSongAction = async ({
 
   const cookieStore = cookies();
   const cookieName = "song-list";
-  const requestSongListId = cookieStore.get(cookieName)
-
-  console.log("requestSongListId", requestSongListId);
-  
+  const requestSongListId = cookieStore.get(cookieName);
 
   if (!requestSongListId?.value) {
     cookies().set({
@@ -67,8 +65,8 @@ export const requestSongAction = async ({
 
   return await prisma.song.findMany({
     where: {
-      User: {
-        username: name,
+      LiveSession: {
+        id,
       },
     },
     orderBy: {

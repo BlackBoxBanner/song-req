@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@prisma/client";
+import { LiveSession, User } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { changeLive } from "@/components/action/admin";
 import {
@@ -29,35 +29,35 @@ import {
 } from "@/components/ui/menubar";
 
 interface ChangeLiveFormProps {
-  live: User["live"];
-  name: User["name"];
+  id: LiveSession["id"];
+  live: LiveSession["live"];
 }
 
-const LiveMenu = ({ live, name }: ChangeLiveFormProps) => {
+const LiveMenu = ({ live, id }: ChangeLiveFormProps) => {
   // Use liveStatus here before defining it
   const liveStatus = useReceiveData("receive-session", live);
 
   const onChangeLive = async () => {
     try {
-      const data = await changeLive({ name: name, live: liveStatus });
+      const data = await changeLive({ id, live: liveStatus });
       if (!data) return;
-      sendData("send-session", createObject(name!, data.live)); // Removed the non-null assertion (!)
+      sendData("send-session", createObject(id, data.live)); // Removed the non-null assertion (!)
     } catch (error) {
       console.error("Error changing live status:", error);
     }
   };
 
   useEffect(() => {
-    if (name) {
-      joinRoom(name); // Safely join the room using props.name
+    if (id) {
+      joinRoom(id); // Safely join the room using props.name
     }
 
     return () => {
-      if (name) {
-        leaveRoom(name); // Leave room on component unmount
+      if (id) {
+        leaveRoom(id); // Leave room on component unmount
       }
     };
-  }, [name]);
+  }, [id]);
   return (
     <MenubarMenu>
       <MenubarTrigger>{liveStatus ? "Live" : "Offline"}</MenubarTrigger>
@@ -68,36 +68,35 @@ const LiveMenu = ({ live, name }: ChangeLiveFormProps) => {
   );
 };
 interface LiveStatusProps {
-  live: User["live"];
-  name: User["name"];
-  prefix?: string;
+  id: LiveSession["id"];
+  live: LiveSession["live"];
 }
 
-const LiveStatus = ({ prefix = "", ...props }: LiveStatusProps) => {
-  const liveStatus = useReceiveData("receive-session", props.live);
+const LiveStatus = ({ id, live }: LiveStatusProps) => {
+  const liveStatus = useReceiveData("receive-session", live);
 
   useEffect(() => {
-    if (props.name) {
-      joinRoom(props.name); // Join room when component mounts
+    if (id) {
+      joinRoom(id); // Join room when component mounts
     }
 
     return () => {
-      if (props.name) {
-        leaveRoom(props.name); // Clean up by leaving the room on unmount
+      if (id) {
+        leaveRoom(id); // Clean up by leaving the room on unmount
       }
     };
-  }, [props.name]);
+  }, [id]);
 
   return (
     <p
       className={cn(
-        "w-full p-2 rounded text-center col-span-2 shadow",
+        "w-full p-2 rounded text-center shadow",
         liveStatus
           ? "bg-green-400 text-primary"
           : "bg-red-600 text-primary-foreground"
       )}
     >
-      {`${prefix} ${liveStatus ? "Live" : "Offline"}`}
+      {`${liveStatus ? "Live" : "Offline"}`}
     </p>
   );
 };

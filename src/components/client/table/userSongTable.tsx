@@ -20,7 +20,7 @@ const UserSongTable = ({ songs: initialSong }: UserSongTableProps) => {
   const songs = useReceiveData<Song[]>("receive-song", initialSong);
   return (
     <>
-      <Table>
+      <Table className="col-span-2">
         <TableHeader>
           <TableRow className="sticky top-0 z-10 bg-background">
             <TableHead className="w-[40px]"></TableHead>

@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@prisma/client";
+import { LiveSession, User } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { setLimit as setLimitAction } from "@/components/action/admin";
 import {
@@ -23,22 +23,22 @@ import {
 } from "@/components/ui/dialog";
 
 interface LimitFormProps {
-  name: User["name"];
-  limit: User["limit"];
+  id: LiveSession["id"];
+  limit: LiveSession["limit"];
 }
 
 export const LimitForm = forwardRef<HTMLButtonElement, LimitFormProps>(
-  ({ name, limit: limitDefault }, ref) => {
+  ({ id, limit: limitDefault }, ref) => {
     const songLimit = useReceiveData("receive-limit", limitDefault);
     const closeRef = useRef<HTMLButtonElement>(null);
     const [limit, setLimit] = useState(songLimit);
 
     const onSubmit = async () => {
-      if (!name) return;
+      if (!id) return;
       try {
-        const songs = await setLimitAction({ name, limit });
-        sendData("send-limit", createObject(name, limit));
-        sendData("send-song", createObject(name, songs?.Song || []));
+        const songs = await setLimitAction({ id, limit });
+        sendData("send-limit", createObject(id, limit));
+        sendData("send-song", createObject(id, songs?.Song || []));
         closeRef.current?.click(); // Close dialog on successful submission
       } catch (error) {
         console.error("Error setting limit or sending data:", error);
@@ -46,16 +46,16 @@ export const LimitForm = forwardRef<HTMLButtonElement, LimitFormProps>(
     };
 
     useEffect(() => {
-      if (name) {
-        joinRoom(name); // Join room when component mounts
+      if (id) {
+        joinRoom(id); // Join room when component mounts
       }
 
       return () => {
-        if (name) {
-          leaveRoom(name); // Clean up by leaving room when component unmounts
+        if (id) {
+          leaveRoom(id); // Clean up by leaving room when component unmounts
         }
       };
-    }, [name]);
+    }, [id]);
 
     return (
       <form

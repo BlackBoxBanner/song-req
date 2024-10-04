@@ -72,6 +72,9 @@ export const registerAction = async ({
             default: true,
           },
         },
+        LiveParticipant: {
+          create: {},
+        },
       },
       select: {
         id: true,
@@ -80,12 +83,18 @@ export const registerAction = async ({
             id: true,
           },
         },
+        LiveParticipant: {
+          select: {
+            id: true,
+          },
+        },
       },
     });
 
-    await prisma.liveParticipant.create({
+    await prisma.liveParticipantOnSessions.create({
       data: {
-        userId: newUser.id,
+        assignedBy: newUser.id,
+        liveParticipantId: newUser.LiveParticipant[0].id,
         liveSessionId: newUser.LiveSession[0].id,
       },
     });

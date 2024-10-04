@@ -1,25 +1,29 @@
-import { getUser } from "@/components/action/admin";
+import { getLiveSessionByRoute } from "@/components/action/admin";
 import { LiveStatus } from "@/components/client/live";
 import SongRequestForm from "@/components/client/songRequestForm";
 import UserSongTable from "@/components/client/table/userSongTable";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 
 const LivePage = async ({ params }: { params: { name: string } }) => {
-  const user = await getUser(params.name, true);
+  const liveSession = await getLiveSessionByRoute(params.name);
 
-  if (!user) return redirect("/");
+  if (!liveSession) return notFound();
 
   return (
     <>
-      <main className="grid grid-cols-1 grid-rows-[auto,1fr,auto] h-dvh p-2 gap-2 relative divide-y">
-        <div>
-        <LiveStatus live={user.live} name={user.name} prefix={`${user.name} is`} />
-        </div>
-        <UserSongTable songs={user.Song} />
+      <main className="bg-background h-dvh p-4 gap-4 grid grid-cols-1 grid-rows-[auto,1fr,auto]">
+        {/* Top: Auto Height */}
+        <LiveStatus live={liveSession.live} id={liveSession.id} />
+
+        {/* Middle: Takes full available height */}
+        <UserSongTable songs={liveSession.Song} />
+
+        {/* Bottom: Auto Height */}
         <SongRequestForm
-          live={user.live}
-          name={params.name}
-          limit={user.limit}
+          live={liveSession.live}
+          id={liveSession.id}
+          limit={liveSession.limit}
+          allowRequest={liveSession.allowRequest}
         />
       </main>
     </>

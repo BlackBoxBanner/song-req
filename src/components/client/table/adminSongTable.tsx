@@ -16,7 +16,7 @@ import {
   useReceiveData,
   leaveRoom,
 } from "@/lib/socket"; // Added leaveRoom for cleanup
-import { Song } from "@prisma/client";
+import { LiveSession, Song } from "@prisma/client";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { editSong } from "@/components/action/admin";
@@ -26,10 +26,10 @@ import Link from "next/link";
 
 type AdminSongTableProps = {
   songs: Song[];
-  name: string;
+  id: LiveSession["id"];
 };
 
-const AdminSongTable = ({ songs: initialSongs, name }: AdminSongTableProps) => {
+const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
   // Using socket to receive updated songs list
   const songs = useReceiveData<Song[]>("receive-song", initialSongs);
 
@@ -39,7 +39,7 @@ const AdminSongTable = ({ songs: initialSongs, name }: AdminSongTableProps) => {
       // Edit the song status and get the updated song list
       const newSongList = await editSong({ id: song.id, done: checked });
       // Send the updated song list via socket
-      sendData("send-song", createObject(name, newSongList));
+      sendData("send-song", createObject(id, newSongList));
     } catch (error) {
       console.error("Error updating song status:", error);
     }
@@ -47,14 +47,14 @@ const AdminSongTable = ({ songs: initialSongs, name }: AdminSongTableProps) => {
 
   // Join room on mount and leave on unmount
   useEffect(() => {
-    if (name) {
-      joinRoom(name);
+    if (id) {
+      joinRoom(id);
 
       return () => {
-        leaveRoom(name); // Clean up the socket room
+        leaveRoom(id); // Clean up the socket room
       };
     }
-  }, [name]);
+  }, [id]);
 
   return (
     <>
