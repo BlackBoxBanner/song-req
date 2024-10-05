@@ -12,9 +12,9 @@ import {
   sendData,
   useReceiveData,
   leaveRoom,
-} from "@/lib/socket"; // Added leaveRoom for cleanup
-import { useToast } from "../ui/use-toast";
-import { useEffect } from "react";
+} from "@/lib/socket";
+import { useToast } from "@/components/ui/use-toast";
+import { useEffect, useState } from "react";
 import { LiveSession } from "@prisma/client";
 
 type SongRequestFormProps = {
@@ -50,62 +50,86 @@ const SongRequestForm = ({
   });
 
   const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [cooldown, setCooldown] = useState(0); // Track countdown in seconds
+
+  // Utility function to handle errors and show toast messages
+  const showErrorToast = (message: string) => {
+    toast({
+      title: "Error",
+      description: message,
+      variant: "destructive",
+    });
+  };
 
   // Handle form submission
   const submitHandler = async ({ song }: SongSchemaType) => {
-    if (!song || song.trim() === "") return;
+    if (!song.trim()) return;
+
+    setIsSubmitting(true);
+    setCooldown(5); // Set cooldown for 5 seconds
+
     try {
-      // Perform the song request action
+      // Request the song
       const songList = await requestSongAction({
         id,
         title: song.trim(),
-        songLimit,
       });
 
-      // Send updated song list through socket
+      // Send the updated song list through the socket
       sendData("send-song", createObject(id, songList));
 
       // Reset the form on successful submission
       reset();
     } catch (error) {
-      // Handle error with toast notification
-      if (error instanceof Error) {
-        console.error("Error requesting song:", error);
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
+      const errorMessage =
+        error instanceof Error ? error.message : "Something went wrong";
+      showErrorToast(errorMessage);
+    } finally {
+      // Start countdown for cooldown
+      const countdownInterval = setInterval(() => {
+        setCooldown((prev) => {
+          if (prev === 1) {
+            clearInterval(countdownInterval);
+            setIsSubmitting(false);
+          }
+          return prev - 1;
         });
-      } else {
-        toast({
-          title: "Error",
-          description: "Something went wrong",
-          variant: "destructive",
-        });
-      }
+      }, 1000);
     }
   };
 
-  // Join socket room on component mount and leave on unmount
+  // Join the socket room on mount and leave on unmount
   useEffect(() => {
     if (id) {
-      joinRoom(id); // Join the room for the session
+      joinRoom(id);
 
       return () => {
-        leaveRoom(id); // Leave room when component unmounts
+        leaveRoom(id);
       };
     }
   }, [id]);
 
+  const isInputDisabled =
+    !isLive || !isAllowRequest || isSubmitting || songLimit <= 0;
+
   return (
-    <form className="flex gap-2 pt-2" onSubmit={handleSubmit(submitHandler)}>
+    <form className="flex gap-2 pt-2 items-center" onSubmit={handleSubmit(submitHandler)}>
       <Input
-        placeholder={!isLive ? "Live session is not available" : !isAllowRequest ? "Song request is not allowed at the moment" : "Song name"}
+        placeholder={
+          !isLive
+            ? "Live session is not available"
+            : !isAllowRequest
+            ? "Song request is not allowed at the moment"
+            : songLimit <= 0
+            ? "Song limit reached"
+            : "Enter song name"
+        }
         {...register("song")}
-        disabled={!isLive || !isAllowRequest} // Disable input if live session is not available or song request is not allowed
+        disabled={isInputDisabled} // Input disabled based on conditions
       />
-      <Button type="submit" disabled={!isLive}>
-        Request
+      <Button type="submit" disabled={isInputDisabled}>
+        {isSubmitting ? `Wait ${cooldown}s` : "Request"}
       </Button>
     </form>
   );

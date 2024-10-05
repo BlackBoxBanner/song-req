@@ -14,11 +14,11 @@ const CreateDefaultSessionForm = ({ user }: CreateDefaultSessionFormProps) => {
       <Button
         onClick={() =>
           createLiveSession({
-            createBy: user.id,
             limit: "10",
             name: "Default Session",
             route: user.name ? user.name : "default",
             default: true,
+            createdBy: user.id,
           })
         }
       >

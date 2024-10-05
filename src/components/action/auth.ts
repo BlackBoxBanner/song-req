@@ -8,7 +8,6 @@ import prisma from "@/lib/prisma";
 import * as bcrypt from "bcryptjs";
 
 export const signOutAction = async () => {
-  "use server";
   await signOut();
 };
 
@@ -20,29 +19,27 @@ export const authenticate = async (
     const res = await signIn("credentials", { ...values, redirect: false });
 
     if (res?.error) {
-      // Handle invalid credentials or other errors
-      if (res.error === "CredentialsSignin") {
-        return { success: false, message: "Invalid credentials." };
-      }
-      return { success: false, message: "Something went wrong." };
+      return handleAuthError(res.error);
     }
 
     // If sign-in is successful
     return { success: true };
   } catch (error) {
-    console.log(error);
-
-    // Check if it's an AuthError
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case "CredentialsSignin":
-          return { success: false, message: "Invalid credentials." };
-        default:
-          return { success: false, message: "Something went wrong." };
-      }
-    }
-    throw error;
+    return handleAuthError(error);
   }
+};
+
+const handleAuthError = (error: unknown): ActionResponse => {
+  if (error instanceof AuthError) {
+    switch (error.type) {
+      case "CredentialsSignin":
+        return { success: false, message: "Invalid credentials." };
+      default:
+        return { success: false, message: "Something went wrong." };
+    }
+  }
+  console.error(error);
+  return { success: false, message: "An unexpected error occurred." };
 };
 
 export const registerAction = async ({
@@ -50,21 +47,17 @@ export const registerAction = async ({
   password,
 }: RegisterFormValues): Promise<ActionResponse> => {
   try {
-    const user = await prisma.user.findUnique({
-      where: {
-        username,
-      },
-    });
-
-    if (user) {
-      throw new Error("User already exists");
+    const existingUser = await prisma.user.findUnique({ where: { username } });
+    if (existingUser) {
+      return { success: false, message: "User already exists." };
     }
 
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = await prisma.user.create({
       data: {
         name: username,
         username,
-        password: await bcrypt.hash(password, 10),
+        password: hashedPassword,
         LiveSession: {
           create: {
             name: "default",
@@ -79,18 +72,15 @@ export const registerAction = async ({
       select: {
         id: true,
         LiveSession: {
-          select: {
-            id: true,
-          },
+          select: { id: true },
         },
         LiveParticipant: {
-          select: {
-            id: true,
-          },
+          select: { id: true },
         },
       },
     });
 
+    // Associate the new participant with the session
     await prisma.liveParticipantOnSessions.create({
       data: {
         assignedBy: newUser.id,
@@ -99,12 +89,16 @@ export const registerAction = async ({
       },
     });
 
-    // await prisma.
     return { success: true };
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      return { success: false, message: error.message };
-    }
-    throw error;
+    return handleRegisterError(error);
   }
+};
+
+const handleRegisterError = (error: unknown): ActionResponse => {
+  if (error instanceof Error) {
+    return { success: false, message: error.message };
+  }
+  console.error(error);
+  return { success: false, message: "An unexpected error occurred." };
 };

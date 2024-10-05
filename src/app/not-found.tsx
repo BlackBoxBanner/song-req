@@ -13,8 +13,8 @@ const NotFoundPage = () => {
       <p className="leading-7 [&:not(:first-child)]:mt-6 mb-6 text-center">
         Sorry, the page you are looking for does not exist.
       </p>
-      <Link href="/creator">
-        <Button>Go back to Creator</Button>
+      <Link href="/">
+        <Button>Go back to Home</Button>
       </Link>
     </div>
   );

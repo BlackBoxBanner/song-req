@@ -1,6 +1,5 @@
 import {
-  createLiveSession,
-  getLiveSessionFromUsersName,
+  getLiveSessionFromUserName,
   getUserByName,
 } from "@/components/action/admin";
 import { useSession } from "@/lib/session";
@@ -30,7 +29,7 @@ const CreatorPage = async () => {
 
   const name = session.user.name;
 
-  const liveSession = await getLiveSessionFromUsersName(name);
+  const liveSession = await getLiveSessionFromUserName(name);
   const user = await getUserByName(name);
 
   if (!user) return notFound();

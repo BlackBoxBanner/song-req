@@ -71,9 +71,17 @@ const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
           {songs?.map((song, index) => (
             <TableRow
               key={song.id} // Use the song's unique id as the key
-              className={cn(song.done && "bg-neutral-100")}
+              className={cn("relative", song.done && "text-gray-500 bg-neutral-100")}
             >
-              <TableCell className="font-medium">{index + 1}</TableCell>
+              <TableCell className="font-medium">
+                <div
+                  className={cn(
+                    "absolute h-[1px] -translate-y-1/2 top-1/2 left-0 w-full bg-gray-500",
+                    !song.done && "hidden"
+                  )}
+                />
+                {index + 1}
+              </TableCell>
               <TableCell>
                 <Link
                   href={`https://www.dochord.com/search/?q=${song.title}`}

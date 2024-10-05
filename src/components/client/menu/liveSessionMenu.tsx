@@ -2,23 +2,16 @@
 
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
   MenubarSeparator,
-  MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from "@/components/ui/menubar";
-import { LiveParticipant, LiveSession, User } from "@prisma/client";
+import { LiveSession, User } from "@prisma/client";
 import {
-  changeAllowRequest,
-  changeLive,
+  toggleAllowRequest,
+  toggleLiveStatus,
   deleteSession,
   deleteSongs,
 } from "@/components/action/admin";
@@ -33,10 +26,9 @@ import { useEffect, useRef } from "react";
 import { setLimit as setLimitAction } from "@/components/action/admin";
 import { LimitForm } from "@/components/client/limitForm";
 import { signOutAction } from "@/components/action/auth";
-import LiveParticipantsList from "@/components/client/menu/participants";
 import AddParticipantsForm from "@/components/client/menu/addParticipantsForm";
 import { cn } from "@/lib/utils";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 interface CreatorMenuProps {
   id: LiveSession["id"];
@@ -57,7 +49,7 @@ const LiveSessionMenu = ({
   liveParticipant,
   createBy,
   userId,
-  defaultSession
+  defaultSession,
 }: CreatorMenuProps) => {
   const songLimit = useReceiveData("receive-limit", limit);
   const liveStatus = useReceiveData("receive-session", live);
@@ -81,6 +73,7 @@ const LiveSessionMenu = ({
       const songs = await setLimitAction({ id, limit });
       sendData("send-limit", createObject(id, limit));
       sendData("send-song", createObject(id, songs?.Song || []));
+      sendData("send-allowRequest", createObject(id, songs?.allowRequest)); // Removed the non-null assertion (!)
     } catch (error) {
       console.error("Error setting limit or sending data:", error);
     }
@@ -88,9 +81,11 @@ const LiveSessionMenu = ({
 
   const onChangeLive = async () => {
     try {
-      const data = await changeLive({ id, live: liveStatus });
+      const data = await toggleLiveStatus({ id, live: liveStatus });
       if (!data) return;
       sendData("send-session", createObject(id, data.live)); // Removed the non-null assertion (!)
+      sendData("send-allowRequest", createObject(id, false)); // Removed the non-null assertion (!)
+      sendData("send-song", createObject(id, data?.Song || []));
     } catch (error) {
       console.error("Error changing live status:", error);
     }
@@ -98,7 +93,7 @@ const LiveSessionMenu = ({
 
   const onChangeAllowSongRequest = async () => {
     try {
-      const data = await changeAllowRequest({
+      const data = await toggleAllowRequest({
         id,
         allowRequest: isAllowRequest,
       });

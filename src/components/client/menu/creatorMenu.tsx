@@ -28,11 +28,14 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { forwardRef, useRef } from "react";
+import { forwardRef, useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { createLiveSession } from "@/components/action/admin";
+import {
+  createLiveSession,
+  getAllUniqueRoutes,
+} from "@/components/action/admin";
 
 type CreatorMenuProps = {
   userId: string;
@@ -76,13 +79,6 @@ const CreatorMenu = ({ userId }: CreatorMenuProps) => {
 
 export default CreatorMenu;
 
-const createSessionSchema = z.object({
-  name: z.string().min(3, "Name must be at least 3 characters long"),
-  limit: z.string().default("10"),
-  route: z.string().min(3, "Route must be at least 3 characters long"),
-});
-
-type CreateSessionFormValues = z.infer<typeof createSessionSchema>;
 type CreateSessionDialogProps = {
   userId: string;
 };
@@ -91,6 +87,18 @@ const CreateSessionDialog = forwardRef<
   HTMLButtonElement,
   CreateSessionDialogProps
 >((props, ref) => {
+  const createSessionSchema = z.object({
+    name: z.string().min(3, "Name must be at least 3 characters long"),
+    limit: z.string().default("10"),
+    route: z
+      .string()
+      .min(3, "Route must be at least 3 characters long")
+      .refine((route) => !uniqueRoutes.includes(route), "Route already exists"),
+  });
+
+  type CreateSessionFormValues = z.infer<typeof createSessionSchema>;
+
+  const [uniqueRoutes, setUniqueRoutes] = useState<string[]>([]);
   const closeDialogRefBtn = useRef<HTMLButtonElement>(null);
   const form = useForm<CreateSessionFormValues>({
     resolver: zodResolver(createSessionSchema),
@@ -102,14 +110,21 @@ const CreateSessionDialog = forwardRef<
   });
 
   function onSubmit(values: CreateSessionFormValues) {
-    console.log(values);
     createLiveSession({
-      createBy: props.userId,
-      ...values,
+      name: values.name,
+      limit: values.limit,
+      route: values.route,
+      createdBy: props.userId,
     }).finally(() => {
       closeDialogRefBtn.current?.click();
     });
   }
+
+  useEffect(() => {
+    getAllUniqueRoutes().then((data) => {
+      setUniqueRoutes(data.map((route) => route.route));
+    });
+  }, []);
 
   return (
     <Dialog>

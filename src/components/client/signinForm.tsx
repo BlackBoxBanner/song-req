@@ -17,7 +17,9 @@ import { useToast } from "@/components/ui/use-toast";
 import { authenticate } from "@/components/action/auth";
 import { delay } from "@/components/basic/delay";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 
+// Zod schema for validation
 export const signInSchema = z.object({
   username: z.string().min(1, "Username is required"),
   password: z.string().min(8, "Password must be at least 8 characters"),
@@ -26,6 +28,7 @@ export const signInSchema = z.object({
 export type SignInFormValues = z.infer<typeof signInSchema>;
 
 const SignInForm = () => {
+  // Set up form using react-hook-form and zod
   const form = useForm<SignInFormValues>({
     resolver: zodResolver(signInSchema),
     defaultValues: {
@@ -33,41 +36,48 @@ const SignInForm = () => {
       password: "",
     },
   });
+
   const { toast } = useToast();
   const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = useState(false); // State for submit button
 
+  // Function to handle form submission
   async function onSubmit(values: SignInFormValues) {
+    setIsSubmitting(true); // Disable button when submitting
+
     try {
-      const actionRes = await authenticate(values);
+      const actionRes = await authenticate(values); // Call authentication action
       if (!actionRes.success) {
-        throw new Error(actionRes.message);
+        throw new Error(actionRes.message); // Handle failure
       }
+
+      // Show success toast
       toast({
         title: "Success",
         description: "User registered successfully",
       });
-      delay(300).then(() => {
-        router.push("/creator");
-      });
+
+      // Delay and then navigate to the creator page
+      await delay(300);
+      router.push("/creator");
     } catch (error: unknown) {
-      if (error instanceof Error) {
-        toast({
-          title: "Error",
-          description: error.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "An unknown error occurred",
-          type: "foreground",
-        });
-      }
+      // Handle error with appropriate message
+      const errorMessage =
+        error instanceof Error ? error.message : "An unknown error occurred";
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false); // Re-enable button after processing
     }
   }
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {/* Username Field */}
         <FormField
           control={form.control}
           name="username"
@@ -81,6 +91,8 @@ const SignInForm = () => {
             </FormItem>
           )}
         />
+
+        {/* Password Field */}
         <FormField
           control={form.control}
           name="password"
@@ -94,8 +106,10 @@ const SignInForm = () => {
             </FormItem>
           )}
         />
-        <Button type="submit" className="w-full">
-          Submit
+
+        {/* Submit Button */}
+        <Button type="submit" className="w-full" disabled={isSubmitting}>
+          {isSubmitting ? "Submitting..." : "Submit"}
         </Button>
       </form>
     </Form>

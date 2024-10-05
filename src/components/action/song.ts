@@ -7,70 +7,69 @@ import { cookies } from "next/headers";
 export const requestSongAction = async ({
   id,
   title,
-  songLimit = 10,
 }: {
   id: LiveSession["id"];
   title: Song["title"];
-  songLimit: LiveSession["limit"];
 }) => {
-  const songList = await prisma.song.findMany({
-    where: {
-      LiveSession: {
-        id,
-      },
-    },
-    orderBy: {
-      createAt: "asc",
-    },
+  // Fetch the live session and check for its existence
+  const liveSession = await prisma.liveSession.findUnique({
+    where: { id },
   });
 
-  if (songList.length >= songLimit) {
-    throw new Error("Song limit reached");
+  if (!liveSession || !liveSession.live || !liveSession.allowRequest) {
+    throw new Error(
+      !liveSession
+        ? "Session not found."
+        : !liveSession.live
+        ? "Cannot add song. Session is not live."
+        : "Cannot add song. Song requests are not allowed."
+    );
   }
 
-  const song = await prisma.song.create({
+  // Fetch current songs for the session
+  const songList = await prisma.song.findMany({
+    where: { LiveSession: { id } },
+    orderBy: { createAt: "asc" },
+  });
+
+  // Check if the song limit has been reached
+  if (songList.length >= liveSession.limit) {
+    throw new Error(`Cannot add song. Limit of ${liveSession.limit} reached.`);
+  }
+
+  // Create new song
+  const newSong = await prisma.song.create({
     data: {
       title,
       LiveSession: {
-        connect: {
-          id,
-        },
+        connect: { id },
       },
     },
   });
 
+  // Update the song list cookie
+  updateSongListCookie(newSong.id);
+
+  // Return updated list of songs for the session
+  return [...songList, newSong]; // Return existing songs along with the newly added song
+};
+
+// Function to update the song list cookie
+const updateSongListCookie = (newSongId: string) => {
   const cookieStore = cookies();
   const cookieName = "song-list";
-  const requestSongListId = cookieStore.get(cookieName);
+  const currentSongList = cookieStore.get(cookieName);
+  const songIds: string[] = currentSongList?.value
+    ? JSON.parse(currentSongList.value)
+    : [];
 
-  if (!requestSongListId?.value) {
-    cookies().set({
-      name: cookieName,
-      value: JSON.stringify([song.id]),
-      httpOnly: true,
-      path: "/",
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 3), // 3 hours
-    });
-  }
-
-  const parsedSongListId = JSON.parse(requestSongListId?.value!);
-
+  // Add the new song ID and update the cookie
+  songIds.push(newSongId);
   cookies().set({
     name: cookieName,
-    value: JSON.stringify([...parsedSongListId, song.id]),
+    value: JSON.stringify(songIds),
     httpOnly: true,
     path: "/",
     expires: new Date(Date.now() + 1000 * 60 * 60 * 3), // 3 hours
-  });
-
-  return await prisma.song.findMany({
-    where: {
-      LiveSession: {
-        id,
-      },
-    },
-    orderBy: {
-      createAt: "asc",
-    },
   });
 };

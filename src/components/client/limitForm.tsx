@@ -1,6 +1,6 @@
 "use client";
 
-import { LiveSession, User } from "@prisma/client";
+import { LiveSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
 import { setLimit as setLimitAction } from "@/components/action/admin";
 import {
@@ -21,6 +21,7 @@ import {
   DialogTrigger,
   DialogClose,
 } from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 
 interface LimitFormProps {
   id: LiveSession["id"];
@@ -32,16 +33,42 @@ export const LimitForm = forwardRef<HTMLButtonElement, LimitFormProps>(
     const songLimit = useReceiveData("receive-limit", limitDefault);
     const closeRef = useRef<HTMLButtonElement>(null);
     const [limit, setLimit] = useState(songLimit);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const { toast } = useToast();
 
+    // Handle form submission
     const onSubmit = async () => {
-      if (!id) return;
+      if (!id || isSubmitting) return;
+      setIsSubmitting(true);
+
       try {
+        // Update song limit via admin action
         const songs = await setLimitAction({ id, limit });
+
+        // Send updated limit and song list through socket
         sendData("send-limit", createObject(id, limit));
         sendData("send-song", createObject(id, songs?.Song || []));
-        closeRef.current?.click(); // Close dialog on successful submission
+        sendData("send-allowRequest", createObject(id, songs?.allowRequest)); // Removed the non-null assertion (!)
+
+        // Close the dialog on successful submission
+        closeRef.current?.click();
+
+        // Show success toast
+        toast({
+          title: "Success",
+          description: "Song limit updated successfully",
+        });
       } catch (error) {
         console.error("Error setting limit or sending data:", error);
+
+        // Show error toast
+        toast({
+          title: "Error",
+          description: "Failed to update song limit",
+          variant: "destructive",
+        });
+      } finally {
+        setIsSubmitting(false); // Re-enable submit button after completion
       }
     };
 
@@ -60,35 +87,36 @@ export const LimitForm = forwardRef<HTMLButtonElement, LimitFormProps>(
     return (
       <form
         className="hidden"
-        onSubmit={(e) => e.preventDefault()} // Prevent form's default behavior
+        onSubmit={(e) => e.preventDefault()} // Prevent form submission behavior
       >
         <Dialog>
           <DialogTrigger ref={ref} />
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Set limit</DialogTitle>
+              <DialogTitle>Set Song Request Limit</DialogTitle>
               <DialogDescription>
-                This will set the limit for the number of songs a user can
-                request.
+                Set the maximum number of songs a user can request in this live
+                session.
               </DialogDescription>
             </DialogHeader>
             <Input
               aria-labelledby="limit-input"
               onChange={(e) => {
-                const rawValue = e.target.value;
-                if (rawValue === "") {
-                  return setLimit(0); // Set limit to 0 if input is empty
-                }
-                const value = parseInt(rawValue, 10);
-                if (!isNaN(value)) {
-                  setLimit(value); // Set limit only if the parsed value is a valid number
+                const value = parseInt(e.target.value, 10);
+                // Ensure the value is a valid number and not negative
+                if (!isNaN(value) && value >= 0) {
+                  setLimit(value);
                 }
               }}
               value={limit?.toFixed(0)} // Ensure the input value is an integer string
-              inputMode="numeric" // Set input mode for numeric inputs
+              inputMode="numeric" // Input mode restricted to numeric values
             />
-            <Button type="button" onClick={onSubmit}>
-              Sure
+            <Button
+              type="button"
+              onClick={onSubmit}
+              disabled={isSubmitting} // Disable button when submitting
+            >
+              {isSubmitting ? "Submitting..." : "Set Limit"}
             </Button>
             <DialogClose className="hidden" ref={closeRef} />
           </DialogContent>

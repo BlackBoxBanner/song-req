@@ -34,12 +34,22 @@ const StatusBadgeBar = ({
       };
     }
   }, [id]);
+
   return (
-    <div className="flex  gap-2">
-      <Badge>Session: {isLive ? "Live" : "Offline"}</Badge>
-      <Badge>Allow song request: {isAllowRequest ? "Yes" : "No"}</Badge>
-      <Badge>Song request limit: {songLimit}</Badge>
-      <Badge>Url: {`${process.env.NEXT_PUBLIC_BASE_URL}/live/${route}`}</Badge>
+    <div className="grid grid-cols-2 gap-2">
+      {/* Change to flex-col for vertical stacking */}
+      <Badge className="w-full" variant={isLive ? "default" : "secondary"}>
+        Session: {isLive ? "Live" : "Offline"}
+      </Badge>
+      <Badge className="w-full" variant={isAllowRequest ? "default" : "secondary"}>
+        Allow song request: {isAllowRequest ? "Yes" : "No"}
+      </Badge>
+      <Badge className="w-full col-span-2 sm:col-span-1">
+        Song request limit: {songLimit}
+      </Badge>
+      <Badge className="w-full col-span-2 sm:col-span-1">
+        Url: {`${process.env.NEXT_PUBLIC_BASE_URL}/live/${route}`}
+      </Badge>
     </div>
   );
 };
