@@ -26,11 +26,15 @@ import { useToast } from "@/components/ui/use-toast";
 interface LimitFormProps {
   id: LiveSession["id"];
   limit: LiveSession["limit"];
+  config: {
+    isClearAfterLimitChange: LiveSession["clearOnChangeLimit"];
+  }
 }
 
 export const LimitForm = forwardRef<HTMLButtonElement, LimitFormProps>(
-  ({ id, limit: limitDefault }, ref) => {
+  ({ id, limit: limitDefault, config }, ref) => {
     const songLimit = useReceiveData("receive-limit", limitDefault);
+    const sessionConfig = useReceiveData("receive-session-config", config);
     const closeRef = useRef<HTMLButtonElement>(null);
     const [limit, setLimit] = useState(songLimit);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,7 +47,7 @@ export const LimitForm = forwardRef<HTMLButtonElement, LimitFormProps>(
 
       try {
         // Update song limit via admin action
-        const songs = await setLimitAction({ id, limit });
+        const songs = await setLimitAction({ id, limit, willClear: sessionConfig.isClearAfterLimitChange });
 
         // Send updated limit and song list through socket
         sendData("send-limit", createObject(id, limit));

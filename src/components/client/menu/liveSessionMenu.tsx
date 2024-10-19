@@ -145,7 +145,7 @@ const LiveSessionMenu = ({
 
   return (
     <>
-      <LimitForm id={id} limit={limit} ref={limitFormRef} />
+      <LimitForm id={id} limit={limit} ref={limitFormRef} config={sessionConfig} />
       <Menubar>
         <MenubarMenu>
           <MenubarTrigger>Session</MenubarTrigger>
