@@ -11,7 +11,7 @@ import {
 import { useReceiveData } from "@/lib/socket";
 import { cn } from "@/lib/utils";
 import { Song } from "@prisma/client";
-import { DotsHorizontalIcon } from "@radix-ui/react-icons";
+import { DotsHorizontalIcon, Pencil1Icon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import {
   Popover,
@@ -68,7 +68,7 @@ const UserSongTable = ({ songs: initialSong }: UserSongTableProps) => {
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button size={"icon"} variant={"ghost"} className="h-full flex justify-center items-center" disabled={song.done || !cookieContent.includes(song.id)}>
-                      <DotsHorizontalIcon />
+                      <Pencil1Icon />
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent>
