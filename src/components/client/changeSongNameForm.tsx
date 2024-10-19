@@ -1,4 +1,5 @@
 "use client"
+
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
@@ -12,19 +13,29 @@ import {
     FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { Song } from "@prisma/client"
+import { LiveSession, Song } from "@prisma/client"
+import { createObject, sendData } from "@/lib/socket"
+import { editSongAction } from "@/components/action/song"
+import { useToast } from "@/components/ui/use-toast"
+import { memo, useCallback } from "react"
 
+// Schema for validating song name input
 const songSchema = z.object({
-    song: z.string().min(1, "Song name is required"),
-});
+    song: z.string().trim().min(1, "Song name is required"),
+})
 
-type SongSchemaType = z.infer<typeof songSchema>;
+type SongSchemaType = z.infer<typeof songSchema>
 
 type ChangeSongNameFormProps = {
     song: Song
+    liveId: LiveSession["id"]
 }
 
-export const ChangeSongNameForm = ({ song }: ChangeSongNameFormProps) => {
+// Memoized component to avoid unnecessary re-renders
+export const ChangeSongNameForm = memo(({ song, liveId }: ChangeSongNameFormProps) => {
+    const { toast } = useToast()
+
+    // Initialize form with validation schema and default values
     const form = useForm<SongSchemaType>({
         resolver: zodResolver(songSchema),
         defaultValues: {
@@ -32,9 +43,35 @@ export const ChangeSongNameForm = ({ song }: ChangeSongNameFormProps) => {
         },
     })
 
-    function onSubmit(values: SongSchemaType) {
-        console.log(values)
-    }
+    // Utility function to handle errors and show toast messages
+    const showErrorToast = useCallback((message: string) => {
+        toast({
+            title: "Error",
+            description: message,
+            variant: "destructive",
+        })
+    }, [toast])
+
+    // Handle form submission with async logic
+    const onSubmit = useCallback(
+        async ({ song: songInput }: SongSchemaType) => {
+            try {
+                // Edit the song and send the updated list through socket
+                const songList = await editSongAction({
+                    LiveSessionId: liveId,
+                    id: song.id,
+                    title: songInput,
+                })
+
+                sendData("send-song", createObject(liveId, songList))
+            } catch (error) {
+                const errorMessage =
+                    error instanceof Error ? error.message : "Something went wrong"
+                showErrorToast(errorMessage)
+            }
+        },
+        [liveId, song.id, showErrorToast]
+    )
 
     return (
         <Form {...form}>
@@ -56,4 +93,6 @@ export const ChangeSongNameForm = ({ song }: ChangeSongNameFormProps) => {
             </form>
         </Form>
     )
-}
+})
+
+ChangeSongNameForm.displayName = "ChangeSongNameForm"

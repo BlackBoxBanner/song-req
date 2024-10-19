@@ -16,7 +16,7 @@ const LivePage = async ({ params }: { params: { name: string } }) => {
         <LiveStatus live={liveSession.live} id={liveSession.id} />
 
         {/* Middle: Takes full available height */}
-        <UserSongTable songs={liveSession.Song} />
+        <UserSongTable songs={liveSession.Song} liveId={liveSession.id} />
 
         {/* Bottom: Auto Height */}
         <SongRequestForm
