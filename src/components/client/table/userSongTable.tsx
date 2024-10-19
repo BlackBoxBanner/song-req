@@ -11,7 +11,17 @@ import {
 import { useReceiveData } from "@/lib/socket";
 import { cn } from "@/lib/utils";
 import { Song } from "@prisma/client";
+import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
+import { Button } from "@/components/ui/button";
+import { ChangeSongNameForm } from "@/components/client/changeSongNameForm";
+import { getSongListCookie } from "@/components/action/song";
+import { useEffect, useState } from "react";
 
 type UserSongTableProps = {
   songs: Song[];
@@ -19,6 +29,13 @@ type UserSongTableProps = {
 
 const UserSongTable = ({ songs: initialSong }: UserSongTableProps) => {
   const songs = useReceiveData<Song[]>("receive-song", initialSong);
+  const [cookieContent, setCookieContent] = useState<string[]>([])
+
+  useEffect(() => {
+    getSongListCookie().then((res) => {
+      setCookieContent(res)
+    })
+  }, [setCookieContent])
 
   return (
     <>
@@ -40,12 +57,24 @@ const UserSongTable = ({ songs: initialSong }: UserSongTableProps) => {
               )}
             >
               <TableCell className="font-medium">
-                <div className={cn("absolute h-[1px] -translate-y-1/2 top-1/2 left-0 w-full bg-gray-500",!song.done && "hidden")} />
+                <div className={cn("absolute h-[1px] -translate-y-1/2 top-1/2 left-0 w-full bg-gray-500", !song.done && "hidden")} />
                 {index + 1}
               </TableCell>
               <TableCell>{song.title}</TableCell>
               <TableCell className="text-right">
                 {format(new Date(song.createAt), "HH:mm:ss:SS")}
+              </TableCell>
+              <TableCell className="text-right w-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button size={"icon"} variant={"ghost"} className="h-full flex justify-center items-center" disabled={song.done || !cookieContent.includes(song.id)}>
+                      <DotsHorizontalIcon />
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <ChangeSongNameForm song={song} />
+                  </PopoverContent>
+                </Popover>
               </TableCell>
             </TableRow>
           ))}

@@ -73,3 +73,11 @@ const updateSongListCookie = (newSongId: string) => {
     expires: new Date(Date.now() + 1000 * 60 * 60 * 3), // 3 hours
   });
 };
+
+export const getSongListCookie = (): Promise<string[]> => {
+  const cookieStore = cookies();
+  const cookieName = "song-list";
+  const currentSongList = cookieStore.get(cookieName);
+  
+  return currentSongList?.value ? JSON.parse(currentSongList.value) : [];
+};
