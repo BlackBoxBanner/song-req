@@ -108,6 +108,7 @@ model Song {
   done          Boolean  @default(false)
   createAt      DateTime @default(now())
   liveSessionId String
+  editCount     Boolean  @default(true)
 
   LiveSession LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
 }

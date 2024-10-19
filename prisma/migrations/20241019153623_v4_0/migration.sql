@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Song` ADD COLUMN `editCount` BOOLEAN NOT NULL DEFAULT true;
