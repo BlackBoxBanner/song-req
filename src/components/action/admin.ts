@@ -201,11 +201,29 @@ export const toggleAllowRequest = async ({
   });
 };
 
+export const setLimitConfigAction = async ({
+  id,
+  clearOnChangeLimit,
+}: Pick<LiveSession, "id" | "clearOnChangeLimit">) => {
+  if (!id) return; // Exit if ID is not provided
+
+  const config = await prisma.liveSession.update({
+    where: { id }, // Update session by ID
+    data: { clearOnChangeLimit }, // Set the clearOnChangeLimit value
+    select: { clearOnChangeLimit: true }, // Return updated value
+  });
+
+  revalidatePath("/creator/*");
+
+  return config.clearOnChangeLimit;
+};
+
 // Set limit for a live session
 export const setLimit = async ({
   id,
   limit,
-}: Pick<LiveSession, "id" | "limit">) => {
+  willClear = false,
+}: Pick<LiveSession, "id" | "limit"> & { willClear: boolean }) => {
   if (!id) return; // Exit if ID is not provided
 
   return await prisma.liveSession.update({
@@ -213,7 +231,7 @@ export const setLimit = async ({
     data: {
       limit: Math.abs(limit),
       allowRequest: false,
-      Song: { deleteMany: {} },
+      Song: willClear ? { deleteMany: {} } : {}, // Clear songs if specified
     }, // Set the limit as a non-negative number
     select: {
       limit: true,

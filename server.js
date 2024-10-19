@@ -55,6 +55,10 @@ app.prepare().then(() => {
       io.to(room).emit("receive-limit", data); // Send limit data to the room
     });
 
+    socket.on("send-session-config", ({ room, data }) => {
+      io.to(room).emit("receive-session-config", data); // Send limit data to the room
+    });
+
     // Event for a user leaving a room
     socket.on("leave-room", (room) => {
       socket.leave(room); // Remove the user from the specified room

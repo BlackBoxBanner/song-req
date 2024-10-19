@@ -64,15 +64,16 @@ model User {
 }
 
 model LiveSession {
-  id           String   @id @default(cuid())
-  name         String
-  limit        Int      @default(10)
-  live         Boolean  @default(false)
-  allowRequest Boolean  @default(false)
-  createBy     String
-  default      Boolean  @default(false)
-  route        String   @unique
-  createAt     DateTime @default(now())
+  id                 String   @id @default(cuid())
+  name               String
+  limit              Int      @default(10)
+  clearOnChangeLimit Boolean  @default(true)
+  live               Boolean  @default(false)
+  allowRequest       Boolean  @default(false)
+  createBy           String
+  default            Boolean  @default(false)
+  route              String   @unique
+  createAt           DateTime @default(now())
 
   User         User                        @relation(fields: [createBy], references: [id], onDelete: Cascade)
   participants LiveParticipantOnSessions[]

@@ -2,6 +2,7 @@
 
 import {
   Menubar,
+  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
@@ -14,6 +15,7 @@ import {
   toggleLiveStatus,
   deleteSession,
   deleteSongs,
+  setLimitConfigAction,
 } from "@/components/action/admin";
 import {
   sendData,
@@ -39,6 +41,9 @@ interface CreatorMenuProps {
   createBy: LiveSession["createBy"];
   userId: User["id"];
   defaultSession: LiveSession["default"];
+  config: {
+    isClearAfterLimitChange: LiveSession["clearOnChangeLimit"];
+  }
 }
 
 const LiveSessionMenu = ({
@@ -50,11 +55,12 @@ const LiveSessionMenu = ({
   createBy,
   userId,
   defaultSession,
+  config
 }: CreatorMenuProps) => {
   const songLimit = useReceiveData("receive-limit", limit);
   const liveStatus = useReceiveData("receive-session", live);
   const isAllowRequest = useReceiveData("receive-allowRequest", allowRequest);
-
+  const sessionConfig = useReceiveData("receive-session-config", config);
   const limitFormRef = useRef<HTMLButtonElement>(null);
 
   const route = useRouter();
@@ -70,7 +76,7 @@ const LiveSessionMenu = ({
 
   const handlerChangeLimit = async (limit: number) => {
     try {
-      const songs = await setLimitAction({ id, limit });
+      const songs = await setLimitAction({ id, limit, willClear: sessionConfig.isClearAfterLimitChange });
       sendData("send-limit", createObject(id, limit));
       sendData("send-song", createObject(id, songs?.Song || []));
       sendData("send-allowRequest", createObject(id, songs?.allowRequest)); // Removed the non-null assertion (!)
@@ -113,6 +119,18 @@ const LiveSessionMenu = ({
     }
   };
 
+  const onChangeConfigLimit = async (clearOnChangeLimit: boolean) => {
+    try {
+      const data = await setLimitConfigAction({ id, clearOnChangeLimit });
+      sendData("send-session-config", createObject(id, {
+        ...sessionConfig,
+        isClearAfterLimitChange: !!data
+      })); // Removed the non-null assertion (!)
+    } catch (error) {
+      console.error("Error changing live status:", error);
+    }
+  }
+
   useEffect(() => {
     if (id) {
       joinRoom(id); // Join room when component mounts
@@ -147,6 +165,9 @@ const LiveSessionMenu = ({
           <MenubarTrigger>Songs</MenubarTrigger>
           <MenubarContent>
             <MenubarItem onClick={handleDeleteAll}>Delete all</MenubarItem>
+            <MenubarCheckboxItem onClick={() => onChangeConfigLimit(!sessionConfig.isClearAfterLimitChange)} checked={sessionConfig.isClearAfterLimitChange}>
+              Clear after limit change
+            </MenubarCheckboxItem>
             <MenubarSeparator />
             <MenubarItem disabled>Current limit: {songLimit}</MenubarItem>
             <MenubarItem onClick={() => handlerChangeLimit(0)}>

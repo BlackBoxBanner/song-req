@@ -41,7 +41,7 @@ const CreatorLivePage = async ({
       <main className="h-dvh bg-background p-4 flex flex-col gap-4">
         <div
           className={cn(
-              "grid items-center grid-cols-[1fr,auto]"
+            "grid items-center grid-cols-[1fr,auto]"
           )}
         >
           <LiveSessionMenu
@@ -55,6 +55,9 @@ const CreatorLivePage = async ({
             liveParticipant={liveSession.participants.map(
               (p) => p.liveParticipant.User
             )}
+            config={{
+              isClearAfterLimitChange: liveSession.clearOnChangeLimit,
+            }}
           />
         </div>
         <StatusBadgeBar
