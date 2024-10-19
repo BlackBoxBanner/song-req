@@ -78,6 +78,25 @@ export const getSongListCookie = (): Promise<string[]> => {
   const cookieStore = cookies();
   const cookieName = "song-list";
   const currentSongList = cookieStore.get(cookieName);
-  
+
   return currentSongList?.value ? JSON.parse(currentSongList.value) : [];
+};
+
+export const removeSongFromCookie = (songId: string) => {
+  const cookieStore = cookies();
+  const cookieName = "song-list";
+  const currentSongList = cookieStore.get(cookieName);
+  const songIds: string[] = currentSongList?.value
+    ? JSON.parse(currentSongList.value)
+    : [];
+
+  // Remove the song ID and update the cookie
+  const updatedSongIds = songIds.filter((id) => id !== songId);
+  cookies().set({
+    name: cookieName,
+    value: JSON.stringify(updatedSongIds),
+    httpOnly: true,
+    path: "/",
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 3), // 3 hours
+  });
 };
