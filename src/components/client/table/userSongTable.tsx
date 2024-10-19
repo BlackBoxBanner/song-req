@@ -79,10 +79,11 @@ const UserSongTable = React.memo(({ songs: initialSong, liveId }: UserSongTableP
                   <Button
                     size={"icon"}
                     variant={"ghost"}
-                    className="h-full flex justify-center items-center"
+                    className={cn("h-full flex justify-center items-center",
+                      !cookieContent.includes(song.id) && "opacity-0")}
                     disabled={song.done || !cookieContent.includes(song.id) || !song.editCount}
                   >
-                    <Pencil1Icon />
+                    <Pencil1Icon className={cn((song.done || !song.editCount) && "opacity-50 fill-muted", !cookieContent.includes(song.id) && "opacity-0")} />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent>
