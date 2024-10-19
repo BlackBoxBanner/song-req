@@ -67,7 +67,7 @@ const UserSongTable = ({ songs: initialSong }: UserSongTableProps) => {
               <TableCell className="text-right w-2">
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button size={"icon"} variant={"ghost"} className="h-full flex justify-center items-center" disabled={song.done || !cookieContent.includes(song.id)}>
+                    <Button size={"icon"} variant={"ghost"} className="h-full flex justify-center items-center" disabled={song.done || !cookieContent.includes(song.id) || !song.editCount}>
                       <Pencil1Icon />
                     </Button>
                   </PopoverTrigger>
