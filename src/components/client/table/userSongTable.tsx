@@ -57,16 +57,10 @@ const UserSongTable = React.memo(({ songs: initialSong, liveId }: UserSongTableP
             key={song.id || index} // Ensure song.id is unique, index as fallback
             className={cn(
               "relative",
-              song.done && "text-gray-500 bg-neutral-100"
+              song.done && "text-gray-500 bg-neutral-100 line-through"
             )}
           >
             <TableCell className="font-medium">
-              <div
-                className={cn(
-                  "absolute h-[1px] -translate-y-1/2 top-1/2 left-0 w-full bg-gray-500 hidden lg:block",
-                  !song.done && "hidden"
-                )}
-              />
               {index + 1}
             </TableCell>
             <TableCell>{song.title}</TableCell>
