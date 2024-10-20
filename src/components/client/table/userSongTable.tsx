@@ -63,7 +63,7 @@ const UserSongTable = React.memo(({ songs: initialSong, liveId }: UserSongTableP
             <TableCell className="font-medium">
               <div
                 className={cn(
-                  "absolute h-[1px] -translate-y-1/2 top-1/2 left-0 w-full bg-gray-500",
+                  "absolute h-[1px] -translate-y-1/2 top-1/2 left-0 w-full bg-gray-500 hidden lg:block",
                   !song.done && "hidden"
                 )}
               />
