@@ -63,7 +63,7 @@ const UserSongTable = React.memo(({ songs: initialSong, liveId }: UserSongTableP
             <TableCell className="font-medium">
               {index + 1}
             </TableCell>
-            <TableCell>{song.title} <span className="text-xs text-muted-foreground ml-2">{!song.editCount && "(edited)"}</span></TableCell>
+            <TableCell>{song.title} <span className="text-muted-foreground ml-2">{!song.editCount && "(edited)"}</span></TableCell>
             <TableCell className="text-right">
               {format(new Date(song.createAt), "HH:mm:ss:SS")}
             </TableCell>

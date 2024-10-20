@@ -81,7 +81,7 @@ const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
                   href={`https://www.dochord.com/search/?q=${song.title}`}
                   target="_blank"
                 >
-                  {song.title} <span className="text-xs text-muted-foreground ml-2">{!song.editCount && "(edited)"}</span>
+                  {song.title} <span className="text-muted-foreground ml-2">{!song.editCount && "(edited)"}</span>
                 </Link>
               </TableCell>
               <TableCell className="text-right">
