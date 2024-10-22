@@ -75,9 +75,18 @@ model LiveSession {
   route              String   @unique
   createAt           DateTime @default(now())
 
-  User         User                        @relation(fields: [createBy], references: [id], onDelete: Cascade)
-  participants LiveParticipantOnSessions[]
-  Song         Song[]
+  User              User                        @relation(fields: [createBy], references: [id], onDelete: Cascade)
+  participants      LiveParticipantOnSessions[]
+  Song              Song[]
+  LiveSessionAccess LiveSessionAccess[]
+}
+
+model LiveSessionAccess {
+  id            String @id @default(cuid())
+  liveSessionId String
+  accessCount   Int    @default(0)
+
+  LiveSession LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
 }
 
 model LiveParticipant {
@@ -107,6 +116,7 @@ model Song {
   id            String   @unique @default(cuid())
   title         String
   done          Boolean  @default(false)
+  deleted       Boolean  @default(false)
   createAt      DateTime @default(now())
   liveSessionId String
   editCount     Boolean  @default(true)
