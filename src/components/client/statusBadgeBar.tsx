@@ -41,7 +41,10 @@ const StatusBadgeBar = ({
       <Badge className="w-full" variant={isLive ? "default" : "secondary"}>
         Session: {isLive ? "Live" : "Offline"}
       </Badge>
-      <Badge className="w-full" variant={isAllowRequest ? "default" : "secondary"}>
+      <Badge
+        className="w-full"
+        variant={isAllowRequest ? "default" : "secondary"}
+      >
         Allow song request: {isAllowRequest ? "Yes" : "No"}
       </Badge>
       <Badge className="w-full col-span-2 sm:col-span-1">
