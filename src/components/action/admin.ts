@@ -88,7 +88,7 @@ export const getLiveSessionByRoute = async (route: string) => {
   return await prisma.liveSession.findUnique({
     where: { route }, // Find live session by route
     include: {
-      Song: { orderBy: { createAt: "asc" } }, // Include songs ordered by creation date
+      Song: { where: { deleted: false }, orderBy: { createAt: "asc" } }, // Include songs ordered by creation date
       participants: {
         include: {
           liveParticipant: { include: { User: true } }, // Include participants and their user info
@@ -103,7 +103,9 @@ export const getLiveSessionById = async (id: string, includeSongs = false) => {
   return await prisma.liveSession.findUnique({
     where: { id }, // Find live session by ID
     include: {
-      Song: includeSongs ? { orderBy: { createAt: "asc" } } : false, // Include songs if specified
+      Song: includeSongs
+        ? { where: { deleted: false }, orderBy: { createAt: "asc" } }
+        : false, // Include songs if specified
       participants: {
         include: {
           liveParticipant: { include: { User: true } }, // Include participants and their user info
@@ -174,11 +176,17 @@ export const toggleLiveStatus = async ({
     data: {
       live: !live, // Toggle live status
       allowRequest: false, // Disable song requests
-      Song: { deleteMany: {} }, // Delete all songs
+      Song: {
+        updateMany: {
+          where: { liveSessionId: id },
+          data: { deleted: true },
+        },
+      }, // Delete all songs
     },
     select: {
       live: true,
       Song: {
+        where: { deleted: false },
         orderBy: { createAt: "asc" },
       },
     }, // Return updated live status
@@ -231,12 +239,22 @@ export const setLimit = async ({
     data: {
       limit: Math.abs(limit),
       allowRequest: false,
-      Song: willClear ? { deleteMany: {} } : {}, // Clear songs if specified
+      Song: willClear
+        ? {
+            updateMany: {
+              where: { liveSessionId: id },
+              data: { deleted: true },
+            },
+          }
+        : {}, // Clear songs if specified
     }, // Set the limit as a non-negative number
     select: {
       limit: true,
       allowRequest: true,
-      Song: { orderBy: { createAt: "asc" } },
+      Song: {
+        where: { deleted: false },
+        orderBy: { createAt: "asc" },
+      },
     }, // Return updated limit and ordered songs
   });
 };
@@ -265,8 +283,9 @@ export const deleteSession = async (id: string) => {
 
 // Delete all songs for a given live session
 export const deleteSongs = async (liveSessionId: string) => {
-  await prisma.song.deleteMany({
+  await prisma.song.updateMany({
     where: { LiveSession: { id: liveSessionId } }, // Delete songs linked to the session
+    data: { deleted: true }, // Set songs as deleted
   });
 };
 
@@ -280,7 +299,7 @@ export const editSong = async ({ id, done }: { id: string; done: boolean }) => {
 
   // Fetch and return all songs for the live session ordered by creation date
   return await prisma.song.findMany({
-    where: { liveSessionId: changedSong.LiveSession.id },
+    where: { liveSessionId: changedSong.LiveSession.id, deleted: false },
     orderBy: { createAt: "asc" },
   });
 };

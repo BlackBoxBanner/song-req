@@ -28,7 +28,7 @@ export const requestSongAction = async ({
 
   // Fetch current songs for the session
   const songList = await prisma.song.findMany({
-    where: { LiveSession: { id } },
+    where: { deleted: false, LiveSession: { id } },
     orderBy: { createAt: "asc" },
   });
 
@@ -73,7 +73,7 @@ export const editSongAction = async ({
       live: true,
       allowRequest: true,
       Song: {
-        where: { id },
+        where: { id, deleted: false },
         select: {
           id: true,
           editCount: true,
@@ -98,13 +98,13 @@ export const editSongAction = async ({
 
   // Step 4: Update the song title and reset editCount
   await prisma.song.update({
-    where: { id },
+    where: { id, deleted: false },
     data: { title, editCount: false },
   });
 
   // Step 5: Fetch updated list of songs for the session (order by creation time)
   const songList = await prisma.song.findMany({
-    where: { LiveSession: { id: LiveSessionId } },
+    where: { deleted: false, LiveSession: { id: LiveSessionId } },
     orderBy: { createAt: "asc" },
   });
 
