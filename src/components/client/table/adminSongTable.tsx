@@ -21,7 +21,7 @@ import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
 import { editSong } from "@/components/action/admin";
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
+import { useEffect, useMemo, useState, useCallback, memo } from "react";
 import Link from "next/link";
 
 type AdminSongTableProps = {
@@ -29,35 +29,39 @@ type AdminSongTableProps = {
   id: LiveSession["id"];
 };
 
-const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
-  // Using socket to receive updated songs list
+const AdminSongTable = memo(({ songs: initialSongs, id }: AdminSongTableProps) => {
+  const [error, setError] = useState<string | null>(null);
   const songs = useReceiveData<Song[]>("receive-song", initialSongs);
 
-  // Handle song completion status change
-  const handleCheckChange = async (song: Song, checked: boolean) => {
+  const memoizedSongs = useMemo(() => songs, [songs]);
+
+  const handleCheckChange = useCallback(async (song: Song, checked: boolean) => {
     try {
-      // Edit the song status and get the updated song list
       const newSongList = await editSong({ id: song.id, done: checked });
-      // Send the updated song list via socket
       sendData("send-song", createObject(id, newSongList));
     } catch (error) {
       console.error("Error updating song status:", error);
+      setError("Failed to update song status. Please try again.");
     }
-  };
+  }, [id]);
 
-  // Join room on mount and leave on unmount
   useEffect(() => {
     if (id) {
       joinRoom(id);
 
       return () => {
-        leaveRoom(id); // Clean up the socket room
+        leaveRoom(id);
       };
     }
   }, [id]);
 
+  const tableRowClass = "relative";
+  const tableCellClass = "font-medium";
+  const checkboxClass = "flex justify-center items-center";
+
   return (
     <>
+      {error && <div className="error-message">{error}</div>}
       <Table>
         <TableHeader>
           <TableRow>
@@ -68,12 +72,12 @@ const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {songs?.map((song, index) => (
+          {memoizedSongs?.map((song, index) => (
             <TableRow
-              key={song.id} // Use the song's unique id as the key
-              className={cn("relative", song.done && "text-gray-500 bg-neutral-100 line-through")}
+              key={song.id}
+              className={cn(tableRowClass, song.done && "text-gray-500 bg-neutral-100 line-through")}
             >
-              <TableCell className="font-medium">
+              <TableCell className={tableCellClass}>
                 {index + 1}
               </TableCell>
               <TableCell>
@@ -85,18 +89,17 @@ const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
                 </Link>
               </TableCell>
               <TableCell className="text-right">
-                {format(new Date(song.createAt), "HH:mm:ss:SS")}{" "}
-                {/* Ensure date is formatted properly */}
+                {format(new Date(song.createAt), "HH:mm:ss:SS")}
               </TableCell>
               <TableCell className="flex justify-start items-center">
                 <Checkbox
                   aria-labelledby={`song-check-${song.id}`}
-                  className="flex justify-center items-center"
+                  className={checkboxClass}
                   checked={song.done}
                   onCheckedChange={async (checked) => {
-                    await handleCheckChange(song, !!checked); // Handle checkbox state change
+                    await handleCheckChange(song, !!checked);
                   }}
-                  disabled={song.done} // Disable checkbox if song is marked done
+                  disabled={song.done}
                 />
               </TableCell>
             </TableRow>
@@ -105,6 +108,6 @@ const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
       </Table>
     </>
   );
-};
+});
 
 export default AdminSongTable;
