@@ -1,10 +1,11 @@
-import { getLiveSessionById, getUserByName } from "@/components/action/admin";
 import { notFound, redirect } from "next/navigation";
 import AdminSongTable from "@/components/client/table/adminSongTable";
 import LiveSessionMenu from "@/components/client/menu/liveSessionMenu";
 import StatusBadgeBar from "@/components/client/statusBadgeBar";
 import { useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
+import { fetchUserByUsername } from "@/action/fetchUserByUsername";
+import { fetchLiveSessionById } from "@/action/fetchLiveSessionById";
 
 const CreatorLivePage = async ({
   params: { id },
@@ -16,10 +17,10 @@ const CreatorLivePage = async ({
   // Redirect to home if no valid session
   if (!session?.user?.name) return redirect("/");
 
-  const user = await getUserByName(session.user.name);
+  const user = await fetchUserByUsername(session.user.name);
   if (!user) return notFound();
 
-  const liveSession = await getLiveSessionById(id, true);
+  const liveSession = await fetchLiveSessionById(id, true);
   if (!liveSession) return notFound();
 
   // Check if user is part of the live session

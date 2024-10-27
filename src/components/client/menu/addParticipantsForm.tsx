@@ -11,11 +11,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
-import {
-  addParticipant,
-  getAllUsers,
-  removeParticipant,
-} from "@/components/action/admin";
 import { Check, ChevronsUpDown } from "lucide-react";
 
 import { cn } from "@/lib/utils";
@@ -33,6 +28,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { fetchAllUsers } from "@/action/fetchAllUsers";
+import { addParticipantToLiveSession } from "@/action/addParticipantToLiveSession";
+import { removeParticipantFromLiveSession } from "@/action/removeParticipantFromLiveSession";
 
 type AddParticipantsFormProps = {
   liveParticipant: User[];
@@ -48,7 +46,7 @@ const AddParticipantsForm = ({
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    getAllUsers().then((data) => {
+    fetchAllUsers().then((data) => {
       setUsers(data);
     });
   }, []);
@@ -58,9 +56,9 @@ const AddParticipantsForm = ({
     method: "add" | "remove"
   ) => {
     if (method === "add") {
-      await addParticipant(userId, id);
+      await addParticipantToLiveSession(userId, id);
     } else {
-      await removeParticipant(userId, id);
+      await removeParticipantFromLiveSession(userId, id);
     }
   };
 

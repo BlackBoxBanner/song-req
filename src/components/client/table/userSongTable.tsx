@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import { useReceiveData } from "@/lib/socket";
 import { cn } from "@/lib/utils";
-import { LiveSession, Song } from "@prisma/client";
+import { Song } from "@prisma/client";
 import { Pencil1Icon } from "@radix-ui/react-icons";
 import { format } from "date-fns";
 import {
@@ -20,17 +20,20 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { ChangeSongNameForm } from "@/components/client/changeSongNameForm";
-import { getSongListCookie } from "@/components/action/song";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, use } from "react";
 import React from "react";
+import { getSongListCookie } from "@/action/getSongListCookie";
+import { fetchLiveSessionByRoute } from "@/action/fetchLiveSessionByRoute";
+import { notFound } from "next/navigation";
 
 type UserSongTableProps = {
-  songs: Song[];
-  liveId: LiveSession["id"];
+  LiveSessionPromise: ReturnType<typeof fetchLiveSessionByRoute>;
 };
 
-const UserSongTable = React.memo(({ songs: initialSong, liveId }: UserSongTableProps) => {
-  const songs = useReceiveData<Song[]>("receive-song", initialSong);
+const UserSongTable = React.memo(({ LiveSessionPromise }: UserSongTableProps) => {
+  const liveSession = use(LiveSessionPromise);
+  if (!liveSession) return notFound();
+  const songs = useReceiveData<Song[]>("receive-song", liveSession.Song);
   const [cookieContent, setCookieContent] = useState<string[]>([]);
 
   const fetchSongListCookie = useCallback(async () => {
@@ -81,7 +84,7 @@ const UserSongTable = React.memo(({ songs: initialSong, liveId }: UserSongTableP
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent>
-                  <ChangeSongNameForm song={song} liveId={liveId} />
+                  <ChangeSongNameForm song={song} liveId={liveSession.id} />
                 </PopoverContent>
               </Popover>
             </TableCell>

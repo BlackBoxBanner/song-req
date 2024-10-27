@@ -1,6 +1,6 @@
 "use client";
 
-import { signOutAction } from "@/components/action/auth";
+import { signOutAction } from "@/action/auth";
 import {
   Menubar,
   MenubarContent,
@@ -32,10 +32,8 @@ import { forwardRef, useEffect, useRef, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  createLiveSession,
-  getAllUniqueRoutes,
-} from "@/components/action/admin";
+import { fetchAllUniqueRoutes } from "@/action/fetchAllUniqueRoutes";
+import { createNewLiveSession } from "@/action/createNewLiveSession";
 
 type CreatorMenuProps = {
   userId: string;
@@ -110,7 +108,7 @@ const CreateSessionDialog = forwardRef<
   });
 
   function onSubmit(values: CreateSessionFormValues) {
-    createLiveSession({
+    createNewLiveSession({
       name: values.name,
       limit: values.limit,
       route: values.route,
@@ -121,7 +119,7 @@ const CreateSessionDialog = forwardRef<
   }
 
   useEffect(() => {
-    getAllUniqueRoutes().then((data) => {
+    fetchAllUniqueRoutes().then((data) => {
       setUniqueRoutes(data.map((route) => route.route));
     });
   }, []);

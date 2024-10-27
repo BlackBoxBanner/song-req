@@ -11,13 +11,6 @@ import {
 } from "@/components/ui/menubar";
 import { LiveSession, User } from "@prisma/client";
 import {
-  toggleAllowRequest,
-  toggleLiveStatus,
-  deleteSession,
-  deleteSongs,
-  setLimitConfigAction,
-} from "@/components/action/admin";
-import {
   sendData,
   createObject,
   useReceiveData,
@@ -25,12 +18,17 @@ import {
   leaveRoom,
 } from "@/lib/socket";
 import { useEffect, useRef } from "react";
-import { setLimit as setLimitAction } from "@/components/action/admin";
 import { LimitForm } from "@/components/client/limitForm";
-import { signOutAction } from "@/components/action/auth";
+import { signOutAction } from "@/action/auth";
 import AddParticipantsForm from "@/components/client/menu/addParticipantsForm";
 import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+import { toggleSessionLiveStatus } from "@/action/toggleSessionLiveStatus";
+import { toggleSessionRequestPermission } from "@/action/toggleSessionRequestPermission";
+import { updateSessionLimitConfig } from "@/action/updateSessionLimitConfig";
+import { updateSessionLimit } from "@/action/updateSessionLimit";
+import { removeSession } from "@/action/removeSession";
+import { markSongsAsDeleted } from "@/action/markSongsAsDeleted";
 
 interface CreatorMenuProps {
   id: LiveSession["id"];
@@ -67,7 +65,7 @@ const LiveSessionMenu = ({
 
   const handleDeleteAll = async () => {
     try {
-      await deleteSongs(id); // Delete songs related to the user
+      await markSongsAsDeleted(id); // Delete songs related to the user
       sendData("send-song", createObject(id, [])); // Send an empty list (or the appropriate data structure)
     } catch (error) {
       console.error("Error deleting songs or sending data:", error);
@@ -76,7 +74,7 @@ const LiveSessionMenu = ({
 
   const handlerChangeLimit = async (limit: number) => {
     try {
-      const songs = await setLimitAction({ id, limit, willClear: sessionConfig.isClearAfterLimitChange });
+      const songs = await updateSessionLimit({ id, limit, willClear: sessionConfig.isClearAfterLimitChange });
       sendData("send-limit", createObject(id, limit));
       sendData("send-song", createObject(id, songs?.Song || []));
       sendData("send-allowRequest", createObject(id, songs?.allowRequest)); // Removed the non-null assertion (!)
@@ -87,7 +85,7 @@ const LiveSessionMenu = ({
 
   const onChangeLive = async () => {
     try {
-      const data = await toggleLiveStatus({ id, live: liveStatus });
+      const data = await toggleSessionLiveStatus({ id, live: liveStatus });
       if (!data) return;
       sendData("send-session", createObject(id, data.live)); // Removed the non-null assertion (!)
       sendData("send-allowRequest", createObject(id, false)); // Removed the non-null assertion (!)
@@ -99,7 +97,7 @@ const LiveSessionMenu = ({
 
   const onChangeAllowSongRequest = async () => {
     try {
-      const data = await toggleAllowRequest({
+      const data = await toggleSessionRequestPermission({
         id,
         allowRequest: isAllowRequest,
       });
@@ -112,7 +110,7 @@ const LiveSessionMenu = ({
 
   const onDeleteSession = async () => {
     try {
-      await deleteSession(id);
+      await removeSession(id);
       route.push("/creator");
     } catch (error) {
       console.error("Error changing live status:", error);
@@ -121,7 +119,7 @@ const LiveSessionMenu = ({
 
   const onChangeConfigLimit = async (clearOnChangeLimit: boolean) => {
     try {
-      const data = await setLimitConfigAction({ id, clearOnChangeLimit });
+      const data = await updateSessionLimitConfig({ id, clearOnChangeLimit });
       sendData("send-session-config", createObject(id, {
         ...sessionConfig,
         isClearAfterLimitChange: !!data

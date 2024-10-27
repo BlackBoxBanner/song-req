@@ -7,27 +7,30 @@ import {
   leaveRoom,
 } from "@/lib/socket"; // Added leaveRoom for cleanup
 import { cn } from "@/lib/utils";
-import { useEffect } from "react";
+import { use, useEffect } from "react";
+import { fetchLiveSessionByRoute } from "@/action/fetchLiveSessionByRoute";
+import { notFound } from "next/navigation";
 
 interface LiveStatusProps {
-  id: LiveSession["id"];
-  live: LiveSession["live"];
+  LiveSessionPromise: ReturnType<typeof fetchLiveSessionByRoute>;
 }
 
-export const LiveStatus = ({ id, live }: LiveStatusProps) => {
-  const liveStatus = useReceiveData("receive-session", live);
+export const LiveStatus = ({ LiveSessionPromise }: LiveStatusProps) => {
+  const liveSession = use(LiveSessionPromise)
+  if (!liveSession) return notFound();
+  const liveStatus = useReceiveData("receive-session", liveSession.live);
 
   useEffect(() => {
-    if (id) {
-      joinRoom(id); // Join room when component mounts
+    if (liveSession.id) {
+      joinRoom(liveSession.id); // Join room when component mounts
     }
 
     return () => {
-      if (id) {
-        leaveRoom(id); // Clean up by leaving the room on unmount
+      if (liveSession.id) {
+        leaveRoom(liveSession.id); // Clean up by leaving the room on unmount
       }
     };
-  }, [id]);
+  }, [liveSession?.id]);
 
   return (
     <p

@@ -5,7 +5,6 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { requestSongAction } from "@/components/action/song";
 import {
   createObject,
   joinRoom,
@@ -14,22 +13,21 @@ import {
   leaveRoom,
 } from "@/lib/socket";
 import { useToast } from "@/components/ui/use-toast";
-import { useEffect, useState } from "react";
-import { LiveSession } from "@prisma/client";
+import { use, useEffect, useState } from "react";;
+import { requestSongAction } from "@/action/requestSongAction";
+import { fetchLiveSessionByRoute } from "@/action/fetchLiveSessionByRoute";
+import { notFound } from "next/navigation";
 
 type SongRequestFormProps = {
-  live: LiveSession["live"];
-  id: LiveSession["id"];
-  limit: LiveSession["limit"];
-  allowRequest: LiveSession["allowRequest"];
+  LiveSessionPromise: ReturnType<typeof fetchLiveSessionByRoute>;
 };
 
 const SongRequestForm = ({
-  live = false,
-  id,
-  limit,
-  allowRequest,
+  LiveSessionPromise
 }: SongRequestFormProps) => {
+  const liveSession = use(LiveSessionPromise);
+  if (!liveSession) return notFound();
+  const { id, live, limit, allowRequest } = liveSession;
   const isLive = useReceiveData("receive-session", live);
   const songLimit = useReceiveData("receive-limit", limit);
   const isAllowRequest = useReceiveData("receive-allowRequest", allowRequest);
@@ -120,10 +118,10 @@ const SongRequestForm = ({
           !isLive
             ? "Live session is not available"
             : !isAllowRequest
-            ? "Song request is not allowed at the moment"
-            : songLimit <= 0
-            ? "Song limit reached"
-            : "Enter song name"
+              ? "Song request is not allowed at the moment"
+              : songLimit <= 0
+                ? "Song limit reached"
+                : "Enter song name"
         }
         {...register("song")}
         disabled={isInputDisabled} // Input disabled based on conditions

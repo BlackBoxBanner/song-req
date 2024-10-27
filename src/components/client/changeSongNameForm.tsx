@@ -15,9 +15,9 @@ import {
 import { Input } from "@/components/ui/input"
 import { LiveSession, Song } from "@prisma/client"
 import { createObject, sendData } from "@/lib/socket"
-import { editSongAction } from "@/components/action/song"
 import { useToast } from "@/components/ui/use-toast"
 import { memo, useCallback } from "react"
+import { editSongAction } from "@/action/editSongAction"
 
 // Schema for validating song name input
 const songSchema = z.object({

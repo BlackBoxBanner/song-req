@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { registerAction } from "@/components/action/auth";
+import { registerAction } from "@/action/auth";
 import { useToast } from "@/components/ui/use-toast";
 import { delay } from "@/components/basic/delay";
 import { useRouter } from "next/navigation";

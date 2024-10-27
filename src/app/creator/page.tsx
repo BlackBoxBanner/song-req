@@ -1,7 +1,3 @@
-import {
-  getLiveSessionFromUserName,
-  getUserByName,
-} from "@/components/action/admin";
 import { useSession } from "@/lib/session";
 import { cn } from "@/lib/utils";
 import { notFound, redirect } from "next/navigation"; // Use redirect for navigation handling
@@ -17,6 +13,8 @@ import {
 import { format } from "date-fns";
 import OuterCreatorMenu from "@/components/client/menu/creatorMenu";
 import CreateDefaultSessionForm from "@/components/client/createDefaultSession";
+import { fetchUserLiveSessions } from "@/action/fetchUserLiveSessions";
+import { fetchUserByUsername } from "@/action/fetchUserByUsername";
 
 const CreatorPage = async () => {
   // Fetch the session from the server
@@ -29,8 +27,8 @@ const CreatorPage = async () => {
 
   const name = session.user.name;
 
-  const liveSession = await getLiveSessionFromUserName(name);
-  const user = await getUserByName(name);
+  const liveSession = await fetchUserLiveSessions(name);
+  const user = await fetchUserByUsername(name);
 
   if (!user) return notFound();
 

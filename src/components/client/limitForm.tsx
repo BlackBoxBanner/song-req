@@ -2,7 +2,6 @@
 
 import { LiveSession } from "@prisma/client";
 import { Button } from "@/components/ui/button";
-import { setLimit as setLimitAction } from "@/components/action/admin";
 import {
   createObject,
   joinRoom,
@@ -22,6 +21,7 @@ import {
   DialogClose,
 } from "@/components/ui/dialog";
 import { useToast } from "@/components/ui/use-toast";
+import { updateSessionLimit } from "@/action/updateSessionLimit";
 
 interface LimitFormProps {
   id: LiveSession["id"];
@@ -47,7 +47,7 @@ export const LimitForm = forwardRef<HTMLButtonElement, LimitFormProps>(
 
       try {
         // Update song limit via admin action
-        const songs = await setLimitAction({ id, limit, willClear: sessionConfig.isClearAfterLimitChange });
+        const songs = await updateSessionLimit({ id, limit, willClear: sessionConfig.isClearAfterLimitChange });
 
         // Send updated limit and song list through socket
         sendData("send-limit", createObject(id, limit));

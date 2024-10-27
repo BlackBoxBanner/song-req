@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
-import { authenticate } from "@/components/action/auth";
+import { authenticate } from "@/action/auth";
 import { delay } from "@/components/basic/delay";
 import { useRouter } from "next/navigation";
 import { useState } from "react";

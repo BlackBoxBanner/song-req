@@ -1,7 +1,7 @@
 "use client";
 import { Button } from "@/components/ui/button";
-import { createLiveSession } from "@/components/action/admin";
 import { User } from "@prisma/client";
+import { createNewLiveSession } from "@/action/createNewLiveSession";
 
 type CreateDefaultSessionFormProps = {
   user: User;
@@ -13,7 +13,7 @@ const CreateDefaultSessionForm = ({ user }: CreateDefaultSessionFormProps) => {
       <h1 className="text-3xl font-semibold">No live sessions found</h1>
       <Button
         onClick={() =>
-          createLiveSession({
+          createNewLiveSession({
             limit: "10",
             name: "Default Session",
             route: user.name ? user.name : "default",

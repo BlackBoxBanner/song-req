@@ -19,10 +19,10 @@ import {
 import { LiveSession, Song } from "@prisma/client";
 import { format } from "date-fns";
 import { Checkbox } from "@/components/ui/checkbox";
-import { editSong } from "@/components/action/admin";
 import { cn } from "@/lib/utils";
 import { useEffect, useMemo, useState, useCallback, memo } from "react";
 import Link from "next/link";
+import { updateSongStatus } from "@/action/updateSongStatus";
 
 type AdminSongTableProps = {
   songs: Song[];
@@ -37,7 +37,7 @@ const AdminSongTable = memo(({ songs: initialSongs, id }: AdminSongTableProps) =
 
   const handleCheckChange = useCallback(async (song: Song, checked: boolean) => {
     try {
-      const newSongList = await editSong({ id: song.id, done: checked });
+      const newSongList = await updateSongStatus({ id: song.id, done: checked });
       sendData("send-song", createObject(id, newSongList));
     } catch (error) {
       console.error("Error updating song status:", error);
