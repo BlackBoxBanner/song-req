@@ -1,12 +1,14 @@
-import type {Config} from "tailwindcss";
+import type { Config } from "tailwindcss";
 
 const config = {
   darkMode: ["class"],
   content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
+    // "./pages/**/*.{md,mdx,js,jsx,ts,tsx}",
+    // "./components/**/*.{md,mdx,js,jsx,ts,tsx}",
+    // "./app/**/*.{md,mdx,js,jsx,ts,tsx}",
+    "./src/**/*.{md,mdx,js,jsx,ts,tsx}",
+    "./src/pages/components/mdx-layout.tsx",
+    "./src/mdx-components.tsx"
   ],
   prefix: "",
   theme: {
@@ -60,16 +62,16 @@ const config = {
       },
       keyframes: {
         "accordion-down": {
-          from: {height: "0"},
-          to: {height: "var(--radix-accordion-content-height)"},
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {height: "var(--radix-accordion-content-height)"},
-          to: {height: "0"},
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
         "infinite-scroll": {
-          from: {transform: "translateX(0)"},
-          to: {transform: "translateX(-100%)"},
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(-100%)" },
         },
       },
       animation: {
@@ -79,7 +81,7 @@ const config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate"), require("@tailwindcss/typography")],
 } satisfies Config;
 
 export default config;
