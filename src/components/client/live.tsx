@@ -12,12 +12,11 @@ import { fetchLiveSessionByRoute } from "@/action/fetchLiveSessionByRoute";
 import { notFound } from "next/navigation";
 
 interface LiveStatusProps {
-  LiveSessionPromise: ReturnType<typeof fetchLiveSessionByRoute>;
+  LiveSession: Awaited<ReturnType<typeof fetchLiveSessionByRoute>>
 }
 
-export const LiveStatus = ({ LiveSessionPromise }: LiveStatusProps) => {
-  const liveSession = use(LiveSessionPromise)
-  if (!liveSession) return notFound();
+export const LiveStatus = ({ LiveSession}: LiveStatusProps) => {
+  const liveSession = LiveSession!
   const liveStatus = useReceiveData("receive-session", liveSession.live);
 
   useEffect(() => {

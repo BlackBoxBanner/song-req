@@ -1,4 +1,5 @@
 import type { MDXComponents } from 'mdx/types'
+import Image from 'next/image'
 
 export function useMDXComponents(components: MDXComponents): MDXComponents {
     return {
@@ -18,7 +19,7 @@ export function useMDXComponents(components: MDXComponents): MDXComponents {
         tr: (props) => <tr className="m-0 border-t p-0 even:bg-muted" {...props} />,
         th: (props) => <th className="border px-4 py-2 text-left font-bold [&[align=center]]:text-center [&[align=right]]:text-right" {...props} />,
         td: (props) => <td className="border px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right" {...props} />,
-        img: (props) => <img className='m-auto w-full h-auto object-cover rounded-lg shadow-sm max-w-[500px] mb-8' {...props} />,
+        img: (props) => <Image src={props.src!} alt={props.alt!} width={500} height={500} className='m-auto w-full h-auto object-cover rounded-lg shadow-sm max-w-[500px] mb-8' />,
         ...components,
     }
 }

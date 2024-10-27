@@ -20,19 +20,20 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { ChangeSongNameForm } from "@/components/client/changeSongNameForm";
-import { useEffect, useState, useCallback, use } from "react";
+import { useEffect, useState, useCallback } from "react";
 import React from "react";
 import { getSongListCookie } from "@/action/getSongListCookie";
 import { fetchLiveSessionByRoute } from "@/action/fetchLiveSessionByRoute";
 import { notFound } from "next/navigation";
 
 type UserSongTableProps = {
-  LiveSessionPromise: ReturnType<typeof fetchLiveSessionByRoute>;
+  LiveSession: Awaited<ReturnType<typeof fetchLiveSessionByRoute>>
 };
 
-const UserSongTable = React.memo(({ LiveSessionPromise }: UserSongTableProps) => {
-  const liveSession = use(LiveSessionPromise);
-  if (!liveSession) return notFound();
+const UserSongTable = ({ LiveSession }: UserSongTableProps) => {
+  const liveSession = LiveSession!;
+
+  // Move hook calls out of conditionals to avoid errors
   const songs = useReceiveData<Song[]>("receive-song", liveSession.Song);
   const [cookieContent, setCookieContent] = useState<string[]>([]);
 
@@ -66,7 +67,12 @@ const UserSongTable = React.memo(({ LiveSessionPromise }: UserSongTableProps) =>
             <TableCell className="font-medium">
               {index + 1}
             </TableCell>
-            <TableCell>{song.title} <span className="text-muted-foreground ml-2">{!song.editCount && "(edited)"}</span></TableCell>
+            <TableCell>
+              {song.title}
+              <span className="text-muted-foreground ml-2">
+                {!song.editCount && "(edited)"}
+              </span>
+            </TableCell>
             <TableCell className="text-right">
               {format(new Date(song.createAt), "HH:mm:ss:SS")}
             </TableCell>
@@ -76,11 +82,18 @@ const UserSongTable = React.memo(({ LiveSessionPromise }: UserSongTableProps) =>
                   <Button
                     size={"icon"}
                     variant={"ghost"}
-                    className={cn("h-full flex justify-center items-center",
-                      !cookieContent.includes(song.id) && "opacity-0")}
+                    className={cn(
+                      "h-full flex justify-center items-center",
+                      !cookieContent.includes(song.id) && "opacity-0"
+                    )}
                     disabled={song.done || !cookieContent.includes(song.id) || !song.editCount}
                   >
-                    <Pencil1Icon className={cn((song.done || !song.editCount) && "opacity-50 fill-muted", !cookieContent.includes(song.id) && "opacity-0")} />
+                    <Pencil1Icon
+                      className={cn(
+                        (song.done || !song.editCount) && "opacity-50 fill-muted",
+                        !cookieContent.includes(song.id) && "opacity-0"
+                      )}
+                    />
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent>
@@ -93,8 +106,6 @@ const UserSongTable = React.memo(({ LiveSessionPromise }: UserSongTableProps) =>
       </TableBody>
     </Table>
   );
-});
-
-UserSongTable.displayName = "UserSongTable";
+};
 
 export default UserSongTable;

@@ -29,7 +29,7 @@ type AdminSongTableProps = {
   id: LiveSession["id"];
 };
 
-const AdminSongTable = memo(({ songs: initialSongs, id }: AdminSongTableProps) => {
+const AdminSongTable = ({ songs: initialSongs, id }: AdminSongTableProps) => {
   const [error, setError] = useState<string | null>(null);
   const songs = useReceiveData<Song[]>("receive-song", initialSongs);
 
@@ -108,6 +108,6 @@ const AdminSongTable = memo(({ songs: initialSongs, id }: AdminSongTableProps) =
       </Table>
     </>
   );
-});
+}
 
 export default AdminSongTable;

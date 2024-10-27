@@ -19,14 +19,13 @@ import { fetchLiveSessionByRoute } from "@/action/fetchLiveSessionByRoute";
 import { notFound } from "next/navigation";
 
 type SongRequestFormProps = {
-  LiveSessionPromise: ReturnType<typeof fetchLiveSessionByRoute>;
+  LiveSession: Awaited<ReturnType<typeof fetchLiveSessionByRoute>>
 };
 
 const SongRequestForm = ({
-  LiveSessionPromise
+  LiveSession
 }: SongRequestFormProps) => {
-  const liveSession = use(LiveSessionPromise);
-  if (!liveSession) return notFound();
+  const liveSession = LiveSession!
   const { id, live, limit, allowRequest } = liveSession;
   const isLive = useReceiveData("receive-session", live);
   const songLimit = useReceiveData("receive-limit", limit);
