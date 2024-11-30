@@ -86,7 +86,7 @@ const CtfForm = ({ status: challengeStatus }: CtfFormProps) => {
 
     }
 
-    return status == "beforeStart" && (
+    return status == "during" && (
         <div className="p-6 bg-white shadow rounded-lg text-center mb-4">
             <h2 className="text-2xl font-bold text-indigo-600 mb-4">🔍 ส่งคำตอบ</h2>
             <p className="text-lg text-gray-700 mb-4">ค้นพบโค้ดลับแล้ว? ส่งคำตอบเพื่อรับรางวัล!</p>

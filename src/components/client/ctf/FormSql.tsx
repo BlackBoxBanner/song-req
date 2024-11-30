@@ -31,7 +31,7 @@ const MediumAndHard = () => {
         }
     }
 
-    return status == "beforeStart" && (
+    return status == "during" && (
         <div className="p-6 bg-white shadow rounded-lg text-center mb-4 flex justify-center items-center flex-col">
             <h2 className="text-2xl font-bold text-indigo-600 mb-4">สำหรับระดับกลางและยาก</h2>
             <p className="text-xs">{`hint: ')`}</p>
