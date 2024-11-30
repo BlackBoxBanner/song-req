@@ -24,14 +24,16 @@ const HeadlessCountdownComponent = () => {
     };
 
     return (
-        <div className="p-6 bg-white shadow rounded-lg text-center">
-            <h2 className="text-2xl font-bold text-indigo-600 mb-4">⏳ การนับถอยหลัง</h2>
-            <p className={`text-2xl font-medium mb-4 ${statusColors[status]}`}>
-                {messages[status]}
-            </p>
-            <p className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold ${statusColors[status]}`}>
-                {countdown}
-            </p>
+        <div>
+            <div className="p-6 bg-white shadow rounded-lg text-center mb-8">
+                <h2 className="text-2xl font-bold text-indigo-600 mb-4">⏳ การนับถอยหลัง</h2>
+                <p className={`text-2xl font-medium mb-4 ${statusColors[status]}`}>
+                    {messages[status]}
+                </p>
+                <p className={`text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-bold ${statusColors[status]}`}>
+                    {countdown}
+                </p>
+            </div>
         </div>
     );
 };

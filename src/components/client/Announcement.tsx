@@ -101,6 +101,8 @@ const Announcement = () => {
 
 	}, [isMounted]);
 
+	console.log(process.env.NEXT_PUBLIC_CTF_1);
+
 	return <></>;
 };
 

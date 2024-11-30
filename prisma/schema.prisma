@@ -123,3 +123,21 @@ model Song {
 
   LiveSession LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
 }
+
+enum CtfPosition {
+  FIRST
+  SECOND
+  THIRD
+  FOURTH
+}
+
+model Ctf {
+  id       String      @unique @default(cuid())
+  position CtfPosition
+  contact  String
+}
+
+model CtfAnswer {
+  id     String @unique @default(cuid())
+  answer String
+}

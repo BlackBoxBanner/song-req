@@ -1,8 +1,24 @@
 import CountdownTimer from "@/components/basic/CountdownTimer";
+import CtfForm from "@/components/client/ctf/Form";
+import MediumAndHard from "@/components/client/ctf/FormSql";
 import { Button } from "@/components/ui/button";
+import prisma from "@/lib/prisma";
 import Link from "next/link";
 
-const CTFPage = () => {
+const CTFPage = async () => {
+	const positions = await prisma.ctf.findMany({
+		where: {
+			position: {
+				in: ['FIRST', 'SECOND', 'THIRD', 'FOURTH']
+			}
+		}
+	});
+
+	const first = positions.find(p => p.position === 'FIRST');
+	const second = positions.find(p => p.position === 'SECOND');
+	const third = positions.find(p => p.position === 'THIRD');
+	const fourth = positions.find(p => p.position === 'FOURTH');
+
 	return (
 		<div className="min-h-screen bg-gray-100 text-gray-800">
 			<div className="container mx-auto py-10 lg:px-12 px-4">
@@ -19,6 +35,8 @@ const CTFPage = () => {
 
 				<div className="text-center mb-10">
 					<CountdownTimer />
+					<CtfForm status={{ first, second, third, fourth }} />
+					<MediumAndHard />
 				</div>
 
 				<div className="bg-white shadow rounded-lg p-6 mb-10">
@@ -42,19 +60,14 @@ const CTFPage = () => {
 						</li>
 						<li>
 							เงื่อนไข:
-							ผู้ชนะคือคนแรกที่ค้นพบโค้ดลับและส่งคำตอบผ่านหน้าเว็บไซต์{" "}
-							<Link
-								href="/ctf/submit"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="text-indigo-500 underline"
-							>
-								Link
-							</Link>.
+							ผู้ชนะคือคนแรกที่ค้นพบโค้ดลับและส่งคำตอบผ่านหน้าเว็บไซต์
 						</li>
 						<li>
 							ระยะเวลาร่วมสนุก: กิจกรรมเริ่มตั้งแต่ 1 ธันวาคม 2024 และสิ้นสุดในวันที่ 1 มกราคม 2025.
 							อย่าพลาด!
+						</li>
+						<li className=" text-gray-600">
+							⚠️ หมายเหตุ: หากไม่สามารถติดต่อได้ รางวัลจะไม่ถูกส่งให้
 						</li>
 						<li>
 							<Link href={"/ctf/doc"} className="text-indigo-500 underline">อ่านเพิ่มเติม</Link>
