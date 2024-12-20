@@ -48,7 +48,12 @@ export const editSongAction = async ({
   // Step 3: Update the song title and reset editCount
   await prisma.song.update({
     where: { id, deleted: false },
-    data: { title, editCount: false },
+    data: {
+      title,
+      editCount: {
+        decrement: 1,
+      },
+    },
   });
 
   // Step 4: Fetch updated list of songs for the session (ordered by creation time)

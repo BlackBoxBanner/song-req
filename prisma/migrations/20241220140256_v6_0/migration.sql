@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `Song` MODIFY `editCount` INTEGER NOT NULL DEFAULT 1;

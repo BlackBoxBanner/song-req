@@ -1,10 +1,7 @@
 "use client"
 
-import { addCtfWinner } from "@/action/addCtf";
 import { query23 } from "@/action/ctf23";
 import useCountdownTimer from "@/app/hook/useCountdownTimer";
-import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useState } from "react";
 
 const MediumAndHard = () => {

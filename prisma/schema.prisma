@@ -119,7 +119,7 @@ model Song {
   deleted       Boolean  @default(false)
   createAt      DateTime @default(now())
   liveSessionId String
-  editCount     Boolean  @default(true)
+  editCount     Int  @default(1)
 
   LiveSession LiveSession @relation(fields: [liveSessionId], references: [id], onDelete: Cascade)
 }
