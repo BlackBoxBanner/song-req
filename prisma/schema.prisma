@@ -74,6 +74,7 @@ model LiveSession {
   default            Boolean  @default(false)
   route              String   @unique
   createAt           DateTime @default(now())
+  editCountDefault   Int      @default(1)
 
   User              User                        @relation(fields: [createBy], references: [id], onDelete: Cascade)
   participants      LiveParticipantOnSessions[]

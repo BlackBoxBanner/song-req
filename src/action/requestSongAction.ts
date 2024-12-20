@@ -7,9 +7,11 @@ import { cookies } from "next/headers";
 export const requestSongAction = async ({
   id,
   title,
+  editCountDefault,
 }: {
   id: LiveSession["id"];
   title: Song["title"];
+  editCountDefault: LiveSession["editCountDefault"];
 }) => {
   // Fetch the live session and check for its existence
   const liveSession = await prisma.liveSession.findUnique({
@@ -42,6 +44,7 @@ export const requestSongAction = async ({
   const newSong = await prisma.song.create({
     data: {
       title,
+      editCount: editCountDefault, // TODO -  Change edit count to default value
       LiveSession: {
         connect: { id },
       },
@@ -56,20 +59,20 @@ export const requestSongAction = async ({
 };
 
 const updateSongListCookie = (newSongId: string) => {
-    const cookieStore = cookies();
-    const cookieName = "song-list";
-    const currentSongList = cookieStore.get(cookieName);
-    const songIds: string[] = currentSongList?.value
-      ? JSON.parse(currentSongList.value)
-      : [];
-  
-    // Add the new song ID and update the cookie
-    songIds.push(newSongId);
-    cookies().set({
-      name: cookieName,
-      value: JSON.stringify(songIds),
-      httpOnly: true,
-      path: "/",
-      expires: new Date(Date.now() + 1000 * 60 * 60 * 3), // 3 hours
-    });
-  };
+  const cookieStore = cookies();
+  const cookieName = "song-list";
+  const currentSongList = cookieStore.get(cookieName);
+  const songIds: string[] = currentSongList?.value
+    ? JSON.parse(currentSongList.value)
+    : [];
+
+  // Add the new song ID and update the cookie
+  songIds.push(newSongId);
+  cookies().set({
+    name: cookieName,
+    value: JSON.stringify(songIds),
+    httpOnly: true,
+    path: "/",
+    expires: new Date(Date.now() + 1000 * 60 * 60 * 3), // 3 hours
+  });
+};

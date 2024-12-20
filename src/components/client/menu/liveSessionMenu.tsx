@@ -29,6 +29,7 @@ import { updateSessionLimitConfig } from "@/action/updateSessionLimitConfig";
 import { updateSessionLimit } from "@/action/updateSessionLimit";
 import { removeSession } from "@/action/removeSession";
 import { markSongsAsDeleted } from "@/action/markSongsAsDeleted";
+import { EditCountForm } from "@/components/client/editCountForm";
 
 interface CreatorMenuProps {
   id: LiveSession["id"];
@@ -42,6 +43,7 @@ interface CreatorMenuProps {
   config: {
     isClearAfterLimitChange: LiveSession["clearOnChangeLimit"];
   }
+  editCount: LiveSession["editCountDefault"];
 }
 
 const LiveSessionMenu = ({
@@ -53,13 +55,15 @@ const LiveSessionMenu = ({
   createBy,
   userId,
   defaultSession,
-  config
+  config,
+  editCount,
 }: CreatorMenuProps) => {
   const songLimit = useReceiveData("receive-limit", limit);
   const liveStatus = useReceiveData("receive-session", live);
   const isAllowRequest = useReceiveData("receive-allowRequest", allowRequest);
   const sessionConfig = useReceiveData("receive-session-config", config);
   const limitFormRef = useRef<HTMLButtonElement>(null);
+  const editCountFormRef = useRef<HTMLButtonElement>(null);
 
   const route = useRouter();
 
@@ -144,6 +148,7 @@ const LiveSessionMenu = ({
   return (
     <>
       <LimitForm id={id} limit={limit} ref={limitFormRef} config={sessionConfig} />
+      <EditCountForm id={id} ref={editCountFormRef} editCount={editCount} />
       <Menubar>
         <MenubarMenu>
           <MenubarTrigger>Session</MenubarTrigger>
@@ -185,6 +190,10 @@ const LiveSessionMenu = ({
             </MenubarItem>
             <MenubarItem onClick={() => limitFormRef.current?.click()}>
               Set limit
+            </MenubarItem>
+            <MenubarSeparator />
+            <MenubarItem onClick={() => editCountFormRef.current?.click()}>
+              Edit count limit
             </MenubarItem>
           </MenubarContent>
         </MenubarMenu>

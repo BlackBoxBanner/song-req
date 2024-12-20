@@ -71,6 +71,7 @@ const SongRequestForm = ({
       const songList = await requestSongAction({
         id,
         title: song.trim(),
+        editCountDefault: liveSession.editCountDefault,
       });
 
       // Send the updated song list through the socket

@@ -33,6 +33,7 @@ const CreatorLivePage = async ({
     <main className="h-dvh bg-background p-4 flex flex-col gap-4">
       <div className={cn("grid items-center grid-cols-[1fr,auto]")}>
         <LiveSessionMenu
+          editCount={liveSession.editCountDefault}
           live={liveSession.live}
           id={liveSession.id}
           limit={liveSession.limit}
